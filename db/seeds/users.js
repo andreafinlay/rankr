@@ -1,10 +1,17 @@
 exports.seed = function(knex, Promise) {
-  return knex('users').del()
+  return knex('').truncate()
     .then(function () {
       return Promise.all([
-        knex('users').insert({id: 1, name: 'Alice'}),
-        knex('users').insert({id: 2, name: 'Bob'}),
-        knex('users').insert({id: 3, name: 'Charlie'})
+        knex('creator').insert({id: 1, email:'alice@gmail.com'}),
+        knex('creator').insert({id: 2, email: 'Bob@gmail.com'}),
+        knex('creator').insert({id:3, email: 'Charlie@gmail.com'}),
+
+        knex('poll').insert({id:1,creator_id: 1, admin_url: 'www.example.com', poll_url: 'www.example.com', open: true, question_string: "what on food??"}),
+        knex('option').insert({id: 1, option_name:'wtih cheese', poll_id: 1}),
+        knex('option').insert({id: 2, option_name:'wtihout cheese', poll_id: 1}),
+
+        knex('vote').insert({id: 1, voter_name:'Mike', option_id: 1, rank: 0 }),
+        knex('vote').insert({id: 2, voter_name:'Mike', option_id: 2, rank: 1 })
       ]);
     });
 };
