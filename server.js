@@ -15,7 +15,9 @@ const morgan      = require('morgan');
 const knexLogger  = require('knex-logger');
 
 // Seperated Routes for each Resource
-const usersRoutes = require("./routes/users");
+// const usersRoutes = require("./routes/users");
+
+const pollRoutes = require("./routes/polls")
 
 // Load the logger first so all (static) HTTP requests are logged to STDOUT
 // 'dev' = Concise output colored by response status for development use.
@@ -36,7 +38,10 @@ app.use("/styles", sass({
 app.use(express.static("public"));
 
 // Mount all resource routes
-app.use("/api/users", usersRoutes(knex));
+
+// app.use("/api/users", usersRoutes(knex));
+
+app.use("/api/polls", pollRoutes(knex));
 
 // Home page
 app.get("/", (req, res) => {
@@ -44,8 +49,15 @@ app.get("/", (req, res) => {
 });
 
 // Poll page
-app.get("/:poll_id", (req, res) => {
-  res.render("poll");
+app.get("/polls/:poll_id", (req, res) => {
+  knex
+   .select('poll.question_string','poll.id','option.option_name')
+   .from("poll")
+   .join('option', 'poll.id', 'option.poll_id')
+   .where('poll.id', req.params.poll_id)
+   .then((results) => {
+     res.render("poll", {results: results})
+  });
 });
 //Poll admin
 app.get("/admin/:poll_id", (req, res) => {
