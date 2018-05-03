@@ -49,14 +49,14 @@ app.get("/", (req, res) => {
 });
 // Poll page
 app.get("/polls/:poll_id", (req, res) => {
-       knex
-      .select('poll.question_string','poll.id','option.option_name')
-      .from("poll")
-      .join('option', 'poll.id', 'option.poll_id')
-      .where('poll.id', req.params.poll_id)
-      .then((results) => {
-        res.render("poll", {results: results})
-    });
+  knex
+   .select('poll.question_string','poll.id','option.option_name')
+   .from("poll")
+   .join('option', 'poll.id', 'option.poll_id')
+   .where('poll.id', req.params.poll_id)
+   .then((results) => {
+     res.render("poll", {results: results})
+  });
 });
 //Poll Admin
 app.get("/admin/:poll_id", (req, res) => {

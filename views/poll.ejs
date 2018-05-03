@@ -15,9 +15,10 @@
     </header>
 
 
-    <ul><h1>rankr :  <%=results[0].question_string%></h1>
-    <% Object.keys(results).forEach(   option => {%>
-        <li> <%=results[option].option_name%></li>
+    <h1><%=results[0].question_string%></h1>
+    <ul>
+    <% Object.keys(results).forEach(option => {%>
+        <li><%=results[option].option_name%></li>
       <% })%>
 </ul>
 
