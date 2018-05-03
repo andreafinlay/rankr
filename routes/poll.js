@@ -3,13 +3,13 @@
 const express = require('express');
 const router  = express.Router();
 
-module.exports = (knex) => {
+module.exports = (poll_id) => {
 
-  router.get("/:poll_id", (req, res) => {
+  router.get("/", (req, res) => {
     knex
       .select("*")
       .from("poll")
-      .where(poll.id = req.params.poll_id)
+      .where(poll.id = poll_id)
       .then((results) => {
         res.json(results);
     });

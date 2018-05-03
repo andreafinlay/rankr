@@ -46,7 +46,7 @@ app.get("/", (req, res) => {
 app.get("/:poll_id", (req, res) => {
   res.render("poll");
 });
-//Poll admin
+//Poll Admin
 app.get("/admin/:poll_id", (req, res) => {
   res.render("admin");
 });
