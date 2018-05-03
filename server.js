@@ -42,11 +42,12 @@ app.use("/api/users", usersRoutes(knex));
 app.get("/", (req, res) => {
   res.render("index");
 });
+
 // Poll page
 app.get("/:poll_id", (req, res) => {
   res.render("poll");
 });
-//Poll Admin
+//Poll admin
 app.get("/admin/:poll_id", (req, res) => {
   res.render("admin");
 });
