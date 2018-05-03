@@ -6,12 +6,11 @@
      onFilter: function (evt) {
       var item = evt.item,
  			ctrl = evt.target;
- 		   if (Sortable.utils.is(ctrl, ".js-remove")) {  // Click on remove button
- 			item.parentNode.removeChild(listItem); // remove sortable item
+ 		   if (Sortable.utils.is(ctrl, ".js-remove")) {
+ 			item.parentNode.removeChild(listItem);
  		       }
- 		    else if (Sortable.utils.is(ctrl, ".js-edit")) {  // Click on edit link
- 		} var el = editableList.closest(evt.item);
-    el && el.parentNode.removeChild(el);
+ 		    else if (Sortable.utils.is(ctrl, ".js-edit")) {
+ 		}
   }
 })
 });
