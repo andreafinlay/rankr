@@ -6,13 +6,22 @@
     <link rel="stylesheet" href="/vendor/normalize-4.1.1.css" type="text/css" />
 
     <script type="text/javascript" src="/vendor/jquery-3.0.0.js"></script>
-    <script type="text/javascript" src="/scripts/app.js"></script>
+    <!-- <script type="text/javascript" src="/scripts/poll.js"></script> -->
   </head>
 
   <body>
     <header>
       <% include partials/_header %>
     </header>
-    <h1>This is where you will vote on a particular poll</h1>
+
+
+    <h1><%=results[0].question_string%></h1>
+    <ul>
+    <% Object.keys(results).forEach(option => {%>
+        <li><%=results[option].option_name%></li>
+      <% })%>
+</ul>
+
+
   </body>
 </html>
