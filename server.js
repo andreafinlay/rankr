@@ -42,6 +42,14 @@ app.use("/api/users", usersRoutes(knex));
 app.get("/", (req, res) => {
   res.render("index");
 });
+// Poll page
+app.get("/:poll_id", (req, res) => {
+  res.render("poll");
+});
+//Poll admin
+app.get("/admin/:poll_id", (req, res) => {
+  res.render("admin");
+});
 
 app.listen(PORT, () => {
   console.log("Example app listening on port " + PORT);
