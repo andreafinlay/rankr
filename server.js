@@ -49,9 +49,9 @@ app.get("/", (req, res) => {
 });
 
 // Poll page
-app.get("/polls/:poll_id", (req, res) => {
+app.get("/polls/:poll_id/", (req, res) => {
   knex
-   .select('poll.question_string','poll.id','option.option_name')
+ .select('poll.question_string','poll.id as poll_id','option.option_name','option.id as option_id')
    .from("poll")
    .join('option', 'poll.id', 'option.poll_id')
    .where('poll.id', req.params.poll_id)
