@@ -25,13 +25,17 @@
   })
 
 $('#createNewPoll').on('click', function() {
+    var pollPost = {};
 
-    let pollPost = {};
+    $('.pollOption').each((index, el) => {
+      var question = $(el).clone().children().remove().end().text();
 
-    $('.pollOption').each( (el, i) => {
-      pollPost['options'] ? pollPost['options'].push({i: el}) : pollPost['options'] = [{i: el}];
+      pollPost['options'] ?
+        pollPost['options'].push({[index]: question})
+        :pollPost['options'] = [{[index]: question}];
+      //SQL INJECTION ISSUE ? FIX  HOW ?
       pollPost['email'] = $('#email').val();
-      pollPost['question_string'] = $('#question_string');
+      pollPost['question_string'] = $('#inputDefault').val();
   });
     console.log(pollPost)
 });
