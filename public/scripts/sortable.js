@@ -24,17 +24,17 @@
          $("#addNewText").val("");
   })
 
-$('createNewPollOption').on('click', function() {
+$('#createNewPoll').on('click', function() {
 
     let pollPost = {};
 
-    $.each('pollOption', (el, i) => {
-      pollPost[options] ? post[options].push({i: el}) : post[options] = [{i: el}];
-      pollPost[email] = $('#email_input').val();
-      pollPost[question_string] = $('#question_string');
+    $('.pollOption').each( (el, i) => {
+      pollPost['options'] ? pollPost['options'].push({i: el}) : pollPost['options'] = [{i: el}];
+      pollPost['email'] = $('#email').val();
+      pollPost['question_string'] = $('#question_string');
   });
-
-
+    console.log(pollPost)
+});
 
 });
 
