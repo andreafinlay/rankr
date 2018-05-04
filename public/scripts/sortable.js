@@ -23,4 +23,23 @@
          $("#pollContainer").append(createNewPollOption());
          $("#addNewText").val("");
   })
+
+$('createNewPollOption').on('click', function() {
+
+    let pollPost = {};
+
+    $.each('pollOption', (el, i) => {
+      pollPost[options] ? post[options].push({i: el}) : post[options] = [{i: el}];
+      pollPost[email] = $('#email_input').val();
+      pollPost[question_string] = $('#question_string');
+  });
+
+
+
 });
+
+//  id | creator_id | open | question_string |      key
+// ----+------------+------+-----------------+---------------
+//   1 |          1 | t    | what on food??  | secretkey1234
+
+//{email: '', question_string: '???', options: ['asdf','asdf']
