@@ -35,12 +35,14 @@
          $(".tableBody").append(createNewPollOption());
          $("#addNewText").val("");
   })
+
 $('#createNewPoll').on('click', function() {
 
     var pollPost = {};
 
-    $('.pollOption').each((index, el) => {
-      var question = $(el).clone().children().remove().end().text();
+    $('.optionColumn').each((index, el) => {
+      var question = $(el).text();
+      console.log('question;?', question);
 
       pollPost['options'] ?
         pollPost['options'].push({[index]: question})
