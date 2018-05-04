@@ -48,6 +48,10 @@ app.get("/", (req, res) => {
   res.render("index");
 });
 
+app.get("/poll-created", (req, res) => {
+  res.render("poll-created");
+});
+
 // Poll page
 app.get("/polls/:poll_id/", (req, res) => {
   knex

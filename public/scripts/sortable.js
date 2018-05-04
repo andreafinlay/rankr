@@ -1,5 +1,5 @@
  $(() => {
-   let pollContainer = document.querySelector('#pollContainer');
+   let pollContainer = document.querySelector('.tableBody');
    let pollOption = document.querySelector('.pollOption')
 
    let pollOptionList = Sortable.create(pollContainer, {
@@ -12,15 +12,27 @@
 
        function createNewPollOption() {
            let $newOption   = $("<div>").addClass("pollOption");
-           let newOptionContent = $("#addNewText").val();
-           let deleteButton = $("<button>").text("Delete").addClass("btn btn-primary js-remove");
-           $newOption.append(deleteButton);
-           $newOption.append(newOptionContent);
-           return $newOption;
+           let $newOptionRow = $("<tr>").addClass("optionRow");
+
+           let $optionColumn = $("<td>").addClass("optionColumn");
+           let $deleteColumn = $("<td>").addClass("deleteColumn");
+
+           let $newOptionContent = $("#addNewText").val();
+           let $deleteButton = $("<button>").text("Delete").addClass("btn btn-primary js-remove");
+
+           $optionColumn.append($newOptionContent);
+           $deleteColumn.append($deleteButton);
+
+           $newOptionRow.append($optionColumn);
+           $newOptionRow.append($deleteColumn);
+
+           $newOptionRow.append($newOption);
+
+           return $newOptionRow;
        }
 
-       $(".add").on("click", function(e){
-         $("#pollContainer").append(createNewPollOption());
+       $(".add").on("click", function(e) {
+         $(".tableBody").append(createNewPollOption());
          $("#addNewText").val("");
   })
 

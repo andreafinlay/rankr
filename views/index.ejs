@@ -23,13 +23,10 @@
       <% include partials/_header %>
     </header>
 
+
     <div class="form-group">
      <label for="exampleInputEmail1">Email address</label>
-<<<<<<< HEAD
-     <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email"
-=======
      <input type="email" class="form-control" id="email" aria-describedby="emailHelp" placeholder="Enter email">
->>>>>>> 8a48829720abca7be124797da004c616f0e293b9
      <small id="emailHelp" class="form-text text-muted">We'll send you a link to view the results of your poll.</small>
     </div>
 
@@ -38,18 +35,34 @@
       <input type="text" class="form-control" placeholder="Poll topic" id="inputDefault">
     </div>
 
-    <div id="pollContainer">
-    <div class="pollOption">
-      <button class="btn btn-primary js-remove">Delete</button>
-      foo
-      </div>
-    </div>
+    <table class="table table-hover">
+      <thead>
+        <label class="col-form-label" for="inputDefault">Poll options</label>
+        <tr>
+          <th>Option</th>
+          <th>Remove</th>
+        </tr>
+      </thead>
+      <tbody class="tableBody">
+        <tr>
+          <td class="optionColumn">
+            <div class="pollOption">
+                foo
+            </div>
+          </td>
+          <td class="deleteColumn">
+            <button class="btn btn-primary js-remove">Delete</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
 
     <div class="form-group">
-      <label class="col-form-label" for="inputDefault">Add an option to your poll:</label>
-      <input id="addNewText" type="text" name="text" placeholder="Add a new poll option">
+      <label class="col-form-label" for="inputDefault">Add a new option to your poll:</label>
+      <input id="addNewText" type="text" name="text" placeholder="New option">
       <button class="btn btn-primary add">Add</button>
     </div>
+
 
     <button id="createNewPoll" class="btn btn-primary">Create my poll</button>
 
