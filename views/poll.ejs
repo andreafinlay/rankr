@@ -4,25 +4,51 @@
     <title>Rankr</title>
 
     <link rel="stylesheet" href="/vendor/normalize-4.1.1.css" type="text/css" />
+    <link rel="stylesheet" href="/vendor/border-box.css" type="text/css" />
+    <link rel="stylesheet" href="/styles/layout.css" type="text/css" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="/styles/lists.css"/>
 
     <script type="text/javascript" src="/vendor/jquery-3.0.0.js"></script>
-    <!-- <script type="text/javascript" src="/scripts/poll.js"></script> -->
+    <script type="text/javascript" src="/scripts/app.js"></script>
+    <script type="text/javascript" src="/scripts/sortable.js"></script>
+    <script src="//rubaxa.github.io/Sortable/Sortable.js"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
   </head>
-
   <body>
     <header>
       <% include partials/_header %>
     </header>
 
+    <div>
+      <h1>Poll: <%=results[0].question_string%></h1>
 
-    <h1><%=results[0].question_string%></h1>
-    <ul>
+    <table class="table table-hover">
+      <thead>
+        <label class="col-form-label">Poll options</label>
+        <p>Drag the options to reorder them, first to last</p>
+        <tr>
+          <th>Option</th>
+        </tr>
+      </thead>
+      <tbody class="tableBody">
+        <% Object.keys(results).forEach(option => { %>
+          <tr>
+            <td class="optionColumn">
+              <div class="pollOption">
+          <%= results[option].option_name %>
+        </div>
+      </td>
+    </tr>
+        <% }) %>
+      </tbody>
+    </table>
+
+
+
     <% Object.keys(results).forEach(option => {%>
-        <li><%=results[option].option_name%></li>
-        <li><%=results[option].option_id%></li>
-      <% })%>
-</ul>
-
-
+        <li ><%=results[option].option_id%></li>
+    <% })%>
   </body>
 </html>
