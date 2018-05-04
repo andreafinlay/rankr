@@ -6,8 +6,8 @@
      filter: ".js-remove",
      onFilter: function (evt) {
       let el = pollOptionList.closest(evt.item);
- 			el && el.remove(pollOption);
- 		       }
+      el && el.remove(pollOption);
+           }
          })
 
        function createNewPollOption() {
@@ -35,17 +35,33 @@
          $(".tableBody").append(createNewPollOption());
          $("#addNewText").val("");
   })
-
 $('#createNewPoll').on('click', function() {
 
-    let pollPost = {};
+    var pollPost = {};
 
-    $('.pollOption').each( (el, i) => {
-      pollPost['options'] ? pollPost['options'].push({i: el}) : pollPost['options'] = [{i: el}];
+    $('.pollOption').each((index, el) => {
+      var question = $(el).clone().children().remove().end().text();
+
+      pollPost['options'] ?
+        pollPost['options'].push({[index]: question})
+        :pollPost['options'] = [{[index]: question}];
+
+      //SQL INJECTION ISSUE ? FIX  HOW ?
       pollPost['email'] = $('#email').val();
-      pollPost['question_string'] = $('#question_string');
+      pollPost['question_string'] = $('#inputDefault').val();
   });
+
+
     console.log(pollPost)
+
+    $.ajax({
+      url: "/polls",
+      method: "post",
+      data: pollPost,
+      success: function(hell) {
+        console.log('success')
+      }
+    });
 });
 
 });
