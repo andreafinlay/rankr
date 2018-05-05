@@ -55,6 +55,12 @@ app.get("/poll-created", (req, res) => {
 
 
 app.post('/polls',(req,res) =>{
+  const templateVars = {};
+    function generateSecretKey() {
+  return Math.floor((1 + Math.random()) * 0x1000000).toString(16).substring(1);
+  };
+
+  let secretKey = generateSecretKey();
 
   function creatorPromise() {
     return new Promise((resolve,reject) => {
@@ -68,10 +74,16 @@ app.post('/polls',(req,res) =>{
 
   function pollPromise (creator_id){
     return new Promise((resolve, reject) => {
+      let question = req.body.question_string;
+      templateVars.question_string = question
       knex('poll')
-           .insert({ creator_id: Number(creator_id[0]), question_string: req.body.question_string, open:true, key: 'needFunctionForThis'})
+           .insert({ creator_id: Number(creator_id[0]), question_string: question, open:true, key: secretKey})
            .returning('id')
-           .then((poll_id) => resolve(poll_id))
+           .then((poll_id) => {
+            templateVars.poll_id = poll_id;
+            templateVars.secretkey = secretKey;
+            resolve(poll_id)
+          })
            .catch(e => reject(e));
     });
   };
@@ -91,9 +103,28 @@ app.post('/polls',(req,res) =>{
 creatorPromise()
   .then((creator_id) => pollPromise(creator_id))
   .then((poll_id) => optionPromise(poll_id))
+  .then( () => {
+    console.log(templateVars)
+    res.send(templateVars)
+  })
   .catch(e => {console.log(e)})
 
-    });
+});
+
+//*********__________-------------------polls results doesnt wokr
+app.get("/polls/:poll_id/result", (req, res) => {
+  console.log(req.params.poll_id)
+  knex
+   .select('poll.question_string','poll.id as poll_id','option.option_name','option.id as option_id','vote.rank')
+   .from("poll")
+   .join('option', 'poll.id', 'option.poll_id')
+   .join('vote', 'vote.option_id', 'option.id')
+   .where('poll.id', req.params.poll_id)
+   .then((results) => {
+console.log(results[0].question_string)
+   //  res.render("poll", {results: results})
+  });
+});
 
 // Poll page
 app.get("/polls/:poll_id/", (req, res) => {
@@ -103,6 +134,7 @@ app.get("/polls/:poll_id/", (req, res) => {
    .join('option', 'poll.id', 'option.poll_id')
    .where('poll.id', req.params.poll_id)
    .then((results) => {
+    //ok but what? why does this work, why cant we do this with @?
      res.render("poll", {results: results})
   });
 });

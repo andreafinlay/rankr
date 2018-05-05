@@ -55,13 +55,15 @@ $('#createNewPoll').on('click', function() {
 
 
     console.log(pollPost)
-
     $.ajax({
       url: "/polls",
       method: "post",
       data: pollPost,
-      success: function(hell) {
-        console.log('success')
+      success: function(templateVars) {
+
+        $('#pollEverything ').empty();
+        let sd =$('<h1>').text(JSON.stringify(templateVars))
+         $('#pollEverything').append(sd)
       }
     });
 });
