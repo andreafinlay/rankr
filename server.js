@@ -6,8 +6,10 @@ const PORT        = process.env.PORT || 8080;
 const ENV         = process.env.ENV || "development";
 const express     = require("express");
 const bodyParser  = require("body-parser");
+const mailgun     = require('mailgun.js');
 const sass        = require("node-sass-middleware");
 const app         = express();
+const mg          = mailgun.client({username: 'api', key: process.env.MAILGUN_API_KEY || 'key-yourkeyhere'});
 
 const knexConfig  = require("./knexfile");
 const knex        = require("knex")(knexConfig[ENV]);
@@ -130,6 +132,15 @@ creatorPromise()
   })
   .catch(e => {console.log(e)})
 
+  mg.messages.create("sandbox37aca15d55444736955d58b502031cba.mailgun.org", {
+    from: "Rankr <postmaster@sandbox37aca15d55444736955d58b502031cba.mailgun.org>",
+    to: ["aden.collinge@gmail.com"],
+    subject: "New message from Rankr!",
+    text: "Get rank'd!!!"
+  })
+  .then(msg => console.log(msg))
+  .catch(err => console.log(err));
+
 });
 
 //*********__________-------------------polls results doesnt wokr
@@ -166,6 +177,8 @@ app.get("/polls/:poll_id/results", (req, res) => {
    // templateVars['results'] = results;
 
 });
+
+
 
 // Poll page
 app.get("/polls/:poll_id/", (req, res) => {
