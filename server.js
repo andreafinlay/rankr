@@ -37,6 +37,27 @@ app.use("/styles", sass({
 }));
 app.use(express.static("public"));
 
+
+//--------------------helper__________--------------
+function zeroIndexBorda(votes){
+  console.log('here',votes)
+  var options_length = 3;
+  var num_of_votes = votes.length;
+  //console.log(votes.length);
+  var results = {};
+  votes.forEach(vote => {
+    results[vote.option_name] ?
+    results[vote.option_name] += Number(vote.rank)
+    :results[vote.option_name] = Number(vote.rank)
+  });
+ // console.log('raw results:',results);
+  return Object.keys(results).reduce((prev, cur) => {
+   prev[cur] = ((results[cur])/votes.length*100);
+   return prev;
+}, {});
+}
+
+//---------------------–––––––--
 // Mount all resource routes
 
 // app.use("/api/users", usersRoutes(knex));
@@ -112,25 +133,38 @@ creatorPromise()
 });
 
 //*********__________-------------------polls results doesnt wokr
-app.get("/polls/results/:poll_id", (req, res) => {
+app.get("/polls/:poll_id/results", (req, res) => {
 
-  console.log(req.params.poll_id)
+  console.log(req.params.poll_id);
+  const templateVars = {};
+
   knex
-   .select('vote.id',)
+   .select('vote.id','poll_id','vote.rank','vote.voter_name','option.option_name','vote.option_id')
    .from("poll")
    .join('option', 'poll.id', 'option.poll_id')
    .join('vote','vote.option_id','option.id')
-  // .where('poll.id', req.params.poll_id)
+   .where('poll.id', req.params.poll_id)
    .then((results) => {
-   // .select('poll.question_string','poll.id as poll_id','option.option_name','option.id as option_id','vote.rank')
-   // .from("poll")
-   // .join('option', 'poll.id', 'option.poll_id')
-   // .join('vote', 'vote.option_id', 'option.id')
-   // .where('poll.id', req.params.poll_id)
-   // .then((results) => {
-   console.log(results)
-   //  res.render("poll", {results: results})
+
+    templateVars['results'] = zeroIndexBorda(results)
+    res.render("admin", templateVars);
+
+
+
+
+    // return new Promise((res,rej) => {
+    //   knex
+    //     .select('poll_id','vote.rank','vote.voter_name','option.option_name')
+    //     .from("poll")
+    //     .join('option', 'poll.id', 'option.poll_id')
+    //     .join('vote','vote.option_id','option.id')
+    //     .where('poll.id', req.params.poll_id)
+    // })
   });
+
+      // console.log(results);
+   // templateVars['results'] = results;
+
 });
 
 // Poll page
