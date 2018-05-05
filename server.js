@@ -77,7 +77,7 @@ app.get("/poll-created", (req, res) => {
 });
 
 
-app.post('/polls',(req,res) =>{
+app.post('/polls',(req,res) => {
   const templateVars = {};
     function generateSecretKey() {
   return Math.floor((1 + Math.random()) * 0x1000000).toString(16).substring(1);
@@ -108,39 +108,44 @@ app.post('/polls',(req,res) =>{
             resolve(poll_id)
           })
            .catch(e => reject(e));
-    });
+      });
   };
 
   function optionPromise (poll_id){
-    return new Promise((resolve, reject) =>{
+    return new Promise((resolve, reject) => {
       req.body.options.forEach((option, i) => {
         knex('option')
         .insert({option_name: option[0], poll_id: Number(poll_id[0]) }).catch(err=>console.log(err))
         .then(resolve())
         .catch(e => reject(e));
-    });
-  })
+      });
+    })
   };
-
 
 creatorPromise()
   .then((creator_id) => pollPromise(creator_id))
   .then((poll_id) => optionPromise(poll_id))
   .then( () => {
-    console.log(templateVars)
-    res.send(templateVars)
+    const emailPollURL   = `http://localhost:8080/polls/${templateVars.poll_id}`
+    const emailPollHTML  = emailPollURL.link(emailPollURL);
+    const emailAdminURL  = `http://localhost:8080/polls/${templateVars.poll_id}/${templateVars.secretkey}`
+    const emailAdminHTML = emailAdminURL.link(emailAdminURL);
+    res.send(templateVars);
+    mg.messages.create("sandbox37aca15d55444736955d58b502031cba.mailgun.org", {
+      from: "Rankr <postmaster@sandbox37aca15d55444736955d58b502031cba.mailgun.org>",
+      to: ["aden.collinge@gmail.com", "andreaafinlay@gmail.com"],
+      subject: "Rankr: Your New Poll!",
+      html: `<HTML><head></head><body><div>Your poll, ${templateVars.question_string},
+              has been successfully created!</div>
+             <div>You can view your new poll at: ${emailPollHTML}</div>
+             <div>Your secret key is: ${templateVars.secretkey}.</div>
+             <div>Enter your poll URL plus your secret key into the address bar
+             to view the results of your poll: ${emailAdminHTML}</div></body></HTML>`
+    })
+    .then(msg => console.log(msg))
+    .catch(err => console.log(err));
   })
   .catch(e => {console.log(e)})
-
-  mg.messages.create("sandbox37aca15d55444736955d58b502031cba.mailgun.org", {
-    from: "Rankr <postmaster@sandbox37aca15d55444736955d58b502031cba.mailgun.org>",
-    to: ["aden.collinge@gmail.com"],
-    subject: "New message from Rankr!",
-    text: "Get rank'd!!!"
-  })
-  .then(msg => console.log(msg))
-  .catch(err => console.log(err));
-
 });
 
 //*********__________-------------------polls results doesnt wokr
