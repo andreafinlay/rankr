@@ -112,16 +112,23 @@ creatorPromise()
 });
 
 //*********__________-------------------polls results doesnt wokr
-app.get("/polls/:poll_id/result", (req, res) => {
+app.get("/polls/results/:poll_id", (req, res) => {
+
   console.log(req.params.poll_id)
   knex
-   .select('poll.question_string','poll.id as poll_id','option.option_name','option.id as option_id','vote.rank')
+   .select('vote.id',)
    .from("poll")
    .join('option', 'poll.id', 'option.poll_id')
-   .join('vote', 'vote.option_id', 'option.id')
-   .where('poll.id', req.params.poll_id)
+   .join('vote','vote.option_id','option.id')
+  // .where('poll.id', req.params.poll_id)
    .then((results) => {
-console.log(results[0].question_string)
+   // .select('poll.question_string','poll.id as poll_id','option.option_name','option.id as option_id','vote.rank')
+   // .from("poll")
+   // .join('option', 'poll.id', 'option.poll_id')
+   // .join('vote', 'vote.option_id', 'option.id')
+   // .where('poll.id', req.params.poll_id)
+   // .then((results) => {
+   console.log(results)
    //  res.render("poll", {results: results})
   });
 });
