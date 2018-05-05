@@ -24,15 +24,11 @@
       <% include partials/_header %>
     </header>
 
-    <div>
-      <p>Thanks for creating your poll: "pollid"!</p>
-    <div>
-
-    <p>View or share your poll: http://localhost:8080/polls/:poll_id</p>
-
-    <p>Your secret key: "secretkey"</p>
-
-    <p>Add the secret key to the poll url to see the results of your poll: http://localhost:8080/polls/:poll_id/secretkey</p>
+    <div class="alert alert-info pollCreated">
+      <p>View or share your poll: http://localhost:8080/polls/:poll_id</p>
+      <p>Your secret key: "secretkey"</p>
+      <p>Add the secret key to the poll url to see the results of your poll: http://localhost:8080/polls/:poll_id/secretkey</p>
+    </div>
 
   </body>
 </html>

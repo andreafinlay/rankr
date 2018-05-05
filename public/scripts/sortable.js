@@ -1,77 +1,76 @@
- $(() => {
-   let pollContainer = document.querySelector('.tableBody');
-   let pollOption = document.querySelector('.pollOption')
+$(() => {
+  const pollContainer = document.querySelector('.tableBody');
+  const pollOption = document.querySelector('.pollOption')
 
-   let pollOptionList = Sortable.create(pollContainer, {
-     filter: ".js-remove",
-     onFilter: function (evt) {
+  const pollOptionList = Sortable.create(pollContainer, {
+    filter: ".js-remove",
+    onFilter: function (evt) {
       let el = pollOptionList.closest(evt.item);
       el && el.remove(pollOption);
-           }
-         })
-
-       function createNewPollOption() {
-           let $newOption   = $("<div>").addClass("pollOption");
-           let $newOptionRow = $("<tr>").addClass("optionRow");
-
-           let $optionColumn = $("<td>").addClass("optionColumn");
-           let $deleteColumn = $("<td>").addClass("deleteColumn");
-
-           let $newOptionContent = $("#addNewText").val();
-           let $deleteButton = $("<button>").text("Delete").addClass("btn btn-primary js-remove");
-
-           $optionColumn.append($newOptionContent);
-           $deleteColumn.append($deleteButton);
-
-           $newOptionRow.append($optionColumn);
-           $newOptionRow.append($deleteColumn);
-
-           $newOptionRow.append($newOption);
-
-           return $newOptionRow;
-       }
-
-       $(".add").on("click", function(e) {
-         $(".tableBody").append(createNewPollOption());
-         $("#addNewText").val("");
+    }
   })
 
-$('#createNewPoll').on('click', function() {
+  function createNewPollOption() {
+    const $newOption        = $("<div>").addClass("pollOption");
+    const $newOptionRow     = $("<tr>").addClass("optionRow");
+    const $optionColumn     = $("<td>").addClass("optionColumn");
+    const $deleteColumn     = $("<td>").addClass("deleteColumn");
+    const $newOptionContent = $("#addNewText").val();
+    const $deleteButton     = $("<button>").text("Delete").addClass("btn btn-primary js-remove");
 
-    var pollPost = {};
+    $optionColumn.append($newOptionContent);
+    $deleteColumn.append($deleteButton);
+    $newOptionRow.append($optionColumn);
+    $newOptionRow.append($deleteColumn);
+    $newOptionRow.append($newOption);
+
+    return $newOptionRow;
+  }
+
+  function createPollCreatedMessage(data) {
+    const $pollCreatedMessage = $("<div>").addClass("alert alert-info pollCreated");
+    const questionString      = data.question_string;
+    const secretKey           = data.secretkey;
+    const pollID              = data.poll_id;
+    const $successMessage     = $("<strong>").text("Thanks for creating your poll: " + questionString + "!");
+    const $secretKeyMessage   = $("<div>").addClass("secretKey").text("Your secret key: " + secretKey);
+    const $adminLink          = $("<p>").addClass("adminLink").text("Add the secret key to the poll url to see the results of your poll: http://localhost:8080/polls/" + pollID + "/" + secretKey);
+
+    $pollCreatedMessage.append($successMessage);
+    $pollCreatedMessage.append($secretKeyMessage);
+    $pollCreatedMessage.append($adminLink);
+
+    return $pollCreatedMessage;
+  }
+
+  $(".add").on("click", function(e) {
+    $(".tableBody").append(createNewPollOption());
+    $("#addNewText").val("");
+  })
+
+  $('#createNewPoll').on('click', function() {
+    const pollData = {};
 
     $('.optionColumn').each((index, el) => {
-      var question = $(el).text();
-      console.log('question;?', question);
+      const option = $(el).text();
 
-      pollPost['options'] ?
-        pollPost['options'].push({[index]: question})
-        :pollPost['options'] = [{[index]: question}];
+      pollData['options'] ?
+        pollData['options'].push({[index]: option})
+        :pollData['options'] = [{[index]: option}];
 
       //SQL INJECTION ISSUE ? FIX  HOW ?
-      pollPost['email'] = $('#email').val();
-      pollPost['question_string'] = $('#inputDefault').val();
-  });
+      pollData['email'] = $('#email').val();
+      pollData['question_string'] = $('#pollQuestion').val();
+    });
 
-
-    console.log(pollPost)
     $.ajax({
       url: "/polls",
       method: "post",
-      data: pollPost,
+      data: pollData,
       success: function(templateVars) {
-
         $('#pollEverything ').empty();
-        let sd =$('<h1>').text(JSON.stringify(templateVars))
-         $('#pollEverything').append(sd)
+        $('#pollEverything').append(createPollCreatedMessage(templateVars));
       }
     });
+  });
 });
-
-});
-
-//  id | creator_id | open | question_string |      key
-// ----+------------+------+-----------------+---------------
-//   1 |          1 | t    | what on food??  | secretkey1234
-
-//{email: '', question_string: '???', options: ['asdf','asdf']
