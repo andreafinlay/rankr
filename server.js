@@ -39,23 +39,43 @@ app.use(express.static("public"));
 
 
 //--------------------helper__________--------------
+// function zeroIndexBorda(votes){
+//   console.log('here',votes)
+//   var options_length = 3;
+//   var num_of_votes = votes.length;
+//   //console.log(votes.length);
+//   var results = {};
+//   votes.forEach(vote => {
+//     results[vote.option_name] ?
+//     results[vote.option_name] += Number(vote.rank)
+//     :results[vote.option_name] = Number(vote.rank)
+//   });
+//  // console.log('raw results:',results);
+//   return Object.keys(results).reduce((prev, cur) => {
+//    prev[cur] = ((results[cur])/votes.length*100);
+//    return prev;
+// }, {});
+// }
+
 function zeroIndexBorda(votes){
-  console.log('here',votes)
-  var options_length = 3;
+  var options = {};
   var num_of_votes = votes.length;
-  //console.log(votes.length);
   var results = {};
+  votes.forEach(vote =>{
+    options[vote.option_id] = 1;
+  })
+  var numOfQuestions = Object.keys(options).length;
   votes.forEach(vote => {
     results[vote.option_name] ?
-    results[vote.option_name] += Number(vote.rank)
-    :results[vote.option_name] = Number(vote.rank)
+    results[vote.option_name] += Math.abs(Number(numOfQuestions - vote.rank-1))/num_of_votes
+    :results[vote.option_name] = Math.abs(Number(numOfQuestions - vote.rank-1))/num_of_votes
   });
- // console.log('raw results:',results);
   return Object.keys(results).reduce((prev, cur) => {
-   prev[cur] = ((results[cur])/votes.length*100);
+   prev[cur] = ((results[cur]))*100;
    return prev;
 }, {});
 }
+
 
 //---------------------–––––––--
 // Mount all resource routes
@@ -74,8 +94,32 @@ app.get("/poll-created", (req, res) => {
   res.render("poll-created");
 });
 
+app.post('/polls/:poll_id',(req,res) =>{
+  Object.keys(req.body.options).forEach( option => {
+    knex('vote')
+  .insert({voter_name: 'Michael', option_id: req.body.options[option].option, rank: req.body.options[option].index})
+  .then( () => {
+    console.log('should be in there!')
+  })
+  .catch((e) => {
+    console.log(e)
+  })
+
+
+    // console.log('option',req.body.options[option].option, 'index',req.body.options[option].index)
+
+
+
+
+
+
+  });
+  //console.log("got it ty!", req.body.options)
+})
+
 
 app.post('/polls',(req,res) =>{
+  console.log(req.body)
   const templateVars = {};
     function generateSecretKey() {
   return Math.floor((1 + Math.random()) * 0x1000000).toString(16).substring(1);
@@ -89,7 +133,7 @@ app.post('/polls',(req,res) =>{
         .insert({email:'alice@gmail.com'})
         .returning('id')
         .then((creator_id) => resolve(creator_id))
-        .catch(err=>reject(err));
+        .catch(err => reject(err));
       });
   };
 
@@ -113,7 +157,7 @@ app.post('/polls',(req,res) =>{
     return new Promise((resolve, reject) =>{
       req.body.options.forEach((option, i) => {
         knex('option')
-        .insert({option_name: option[0], poll_id: Number(poll_id[0]) }).catch(err=>console.log(err))
+        .insert({option_name: option[0], poll_id: Number(poll_id[0]) }).catch(err => console.log(err))
         .then(resolve())
         .catch(e => reject(e));
     });
@@ -146,6 +190,7 @@ app.get("/polls/:poll_id/results", (req, res) => {
    .where('poll.id', req.params.poll_id)
    .then((results) => {
 
+    console.log(zeroIndexBorda(results))
     templateVars['results'] = zeroIndexBorda(results)
     res.render("admin", templateVars);
 
