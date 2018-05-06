@@ -53,16 +53,17 @@
       //SQL INJECTION ISSUE ? FIX  HOW ?
     });
 
-    //not geting right suff !!
     $.ajax({
       url: "/polls/" + pollid,
       method: "post",
       datatype: "json",
       data: voteData,
+
       success: function(data) {
         console.log("success");
         $('#votePollEverything').empty();
         $('#votePollEverything').append(createPollVotedMessage(data));
+
       }
     });
 
