@@ -1,6 +1,6 @@
 $(() => {
-  const pollContainer = document.querySelector('.tableBody');
-  const pollOption    = document.querySelector('.pollOption')
+  const pollContainer  = document.querySelector('.tableBody');
+  const pollOption     = document.querySelector('.pollOption')
 
   const pollOptionList = Sortable.create(pollContainer, {
     filter: ".js-remove",
