@@ -71,20 +71,25 @@ app.get("/polls/:poll_id/", (req, res) => {
 });
 
 // Admin page, need to change link name to incl secretkey
-app.get("/polls/:poll_id/results", (req, res) => {
+app.get("/polls/:poll_id/:secret_key", (req, res) => {
   const templateVars = {};
 
   knex
-   .select('vote.id','poll_id','key','vote.rank','vote.voter_name','option.option_name','vote.option_id')
+   .select('poll.key','poll.question_string','vote.id','poll_id','key','vote.rank','vote.voter_name','option.option_name','vote.option_id')
    .from("poll")
    .join('option', 'poll.id', 'option.poll_id')
    .join('vote','vote.option_id','option.id')
    .where('poll.id', req.params.poll_id)
    .then((results) => {
-
-    templateVars['results'] = zeroIndexBorda(results);
-    // templateVars['key']     = results[0].key;
-    res.render("admin", templateVars);
+    console.log(req.params.secret_key,results[0].key)
+      if(req.params.secret_key == results[0].key){
+        templateVars['results'] = zeroIndexBorda(results);
+        templateVars['quesiton']    = results[0].question_string;
+        res.render("admin", templateVars);
+      }
+      else{
+        res.send('error: 404 - <h1>nothing to see here.</h1')
+      }
   });
 });
 
@@ -144,19 +149,19 @@ creatorPromise()
     let emailAdminURL  = `http://localhost:8080/polls/${templateVars.poll_id}/${templateVars.secretkey}`
     let emailAdminHTML = emailAdminURL.link(emailAdminURL);
     res.send(templateVars);
-    mg.messages.create("sandbox37aca15d55444736955d58b502031cba.mailgun.org", {
-      from: "Rankr <postmaster@sandbox37aca15d55444736955d58b502031cba.mailgun.org>",
-      to: [/*"aden.collinge@gmail.com",*/ "andreaafinlay@gmail.com"],
-      subject: "Rankr: Your New Poll!",
-      html: `<HTML><head></head><body><div>Your poll, ${templateVars.question_string},
-              has been successfully created!</div>
-             <div>You can view your new poll at: ${emailPollHTML}</div>
-             <div>Your secret key is: ${templateVars.secretkey}.</div>
-             <div>Enter your poll URL plus your secret key into the address bar
-             to view the results of your poll: ${emailAdminHTML}</div></body></HTML>`
-    })
-    .then(msg => console.log(msg))
-    .catch(err => console.log(err));
+    // mg.messages.create("sandbox37aca15d55444736955d58b502031cba.mailgun.org", {
+    //   from: "Rankr <postmaster@sandbox37aca15d55444736955d58b502031cba.mailgun.org>",
+    //   to: [/*"aden.collinge@gmail.com",*/ "andreaafinlay@gmail.com"],
+    //   subject: "Rankr: Your New Poll!",
+    //   html: `<HTML><head></head><body><div>Your poll, ${templateVars.question_string},
+    //           has been successfully created!</div>
+    //          <div>You can view your new poll at: ${emailPollHTML}</div>
+    //          <div>Your secret key is: ${templateVars.secretkey}.</div>
+    //          <div>Enter your poll URL plus your secret key into the address bar
+    //          to view the results of your poll: ${emailAdminHTML}</div></body></HTML>`
+    // })
+    // .then(msg => console.log(msg))
+    // .catch(err => console.log(err));
   })
   .catch(e => {console.log(e)})
 });
@@ -171,7 +176,10 @@ app.post('/polls/:poll_id',(req,res) => {
     knex('vote')
       .insert({voter_name: 'Michael', option_id: req.body.options[option].option, rank: req.body.options[option].index})
       .returning('id')
-      .then(resolve())
+      .then(()=> {
+        console.log('should be in the db')
+        resolve()
+      })
       .catch(e => reject(e));
       });
     });
@@ -201,7 +209,8 @@ app.post('/polls/:poll_id',(req,res) => {
 
 votePromise()
   .then(() => {
-    findPollPromise(pollId)
+    console.log("i could totally send an email if i wanted to, i swear.")
+    // findPollPromise(pollId)
   })
   .catch(err => console.log(err));
 });
