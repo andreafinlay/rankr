@@ -184,17 +184,14 @@ creatorPromise()
     .then(msg => console.log(msg))
     .catch(err => console.log(err));
   }).then( () => {
+    let emailPollURL   = `http://localhost:8080/polls/${templateVars.poll_id}`
+    let emailAdminURL  = `http://localhost:8080/polls/${templateVars.poll_id}/${templateVars.secretkey}`
     twilioClient.messages.create({
-        body: `Your poll, ${templateVars.question_string},
-                has been successfully created!
-               You can view your new poll at: ${emailPollURL}
-               Your secret key is: ${templateVars.secretkey}
-               Enter your poll URL plus your secret key into the address bar
-               to view the results of your poll: ${emailAdminURL}`,
+        body: `Rankr: Your poll, ${templateVars.question_string}, has been successfully created!\nYou can view your new poll at: ${emailPollURL}.\nYour secret key is: ${templateVars.secretkey}\nEnter your poll URL plus your secret key into the address bar to view the results of your poll: ${emailAdminURL}`,
         to: '+15143478581',
         from: '+15146133217'
     })
-    .then((message) => console.log(message.body.slice(38), message.sid))
+    .then((message) => console.log(message.sid))
   })
   .catch(e => {console.log(e)})
 });
