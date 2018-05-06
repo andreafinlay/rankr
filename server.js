@@ -185,7 +185,12 @@ creatorPromise()
     .catch(err => console.log(err));
   }).then( () => {
     twilioClient.messages.create({
-        body: 'Get Rank\'d',
+        body: `Your poll, ${templateVars.question_string},
+                has been successfully created!
+               You can view your new poll at: ${emailPollURL}
+               Your secret key is: ${templateVars.secretkey}
+               Enter your poll URL plus your secret key into the address bar
+               to view the results of your poll: ${emailAdminURL}`,
         to: '+15143478581',
         from: '+15146133217'
     })
