@@ -4,6 +4,10 @@
     <title>Rankr</title>
 
     <link rel="stylesheet" href="/vendor/normalize-4.1.1.css" type="text/css" />
+    <link rel="stylesheet" href="/vendor/border-box.css" type="text/css" />
+    <link rel="stylesheet" href="/styles/layout.css" type="text/css" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="/styles/lists.css"/>
 
     <script type="text/javascript" src="/vendor/jquery-3.0.0.js"></script>
     <script type="text/javascript" src="/scripts/admin.js"></script>
@@ -15,8 +19,8 @@
     </header>
     <h1>This is where you will view results/delete a poll</h1>
     <% Object.keys(results).forEach(option =>{ %>
-      <h1><%=option%></h1>
-      <div style= 'background-color: black; width:<%=results[option]%>%; height:10px'></div>
+      <p><%=option%></p>
+      <div style="background-color: black; width:<%=results[option]%>%; height:10px"></div>
     <%});%>
   </body>
 </html>

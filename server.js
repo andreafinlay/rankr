@@ -16,14 +16,10 @@ const knex        = require("knex")(knexConfig[ENV]);
 const morgan      = require('morgan');
 const knexLogger  = require('knex-logger');
 
-// Seperated Routes for each Resource
-// const usersRoutes = require("./routes/users");
-
 const pollRoutes = require("./routes/polls")
 
 // Load the logger first so all (static) HTTP requests are logged to STDOUT
 // 'dev' = Concise output colored by response status for development use.
-//         The :status token will be colored red for server error codes, yellow for client error codes, cyan for redirection codes, and uncolored for all other codes.
 app.use(morgan('dev'));
 
 // Log knex SQL queries to STDOUT as well
@@ -37,9 +33,10 @@ app.use("/styles", sass({
   debug: true,
   outputStyle: 'expanded'
 }));
+
 app.use(express.static("public"));
 
-
+app.use("/api/polls", pollRoutes(knex));
 
 //--------------------helper--------------
 function zeroIndexBorda(votes){
@@ -61,45 +58,63 @@ function zeroIndexBorda(votes){
  }, {});
 }
 
-
-app.use("/api/polls", pollRoutes(knex));
-
 // Home page
 app.get("/", (req, res) => {
   res.render("index");
 });
 
 
-app.get("/poll-created", (req, res) => {
-  res.render("poll-created");
+// Spiced up the post req on vote submission w some promise action
+// and also it now sends an email when a user submits their vote
+app.post('/polls/:poll_id',(req,res) => {
+
+  const pollId = (req.params.poll_id);
+
+  function votePromise() {
+    return new Promise((resolve, reject) => {
+    Object.keys(req.body.options).forEach( option => {
+    knex('vote')
+      .insert({voter_name: 'Michael', option_id: req.body.options[option].option, rank: req.body.options[option].index})
+      .returning('id')
+      .then(resolve())
+      .catch(e => reject(e));
+      });
+    });
+  }
+
+  function findPollPromise(pollId) {
+    return new Promise((resolve, reject) => {
+      knex('poll').where({
+        id: pollId
+      }).select('question_string')
+        .then(function(question_string) {
+        const pollQuestion = question_string[0].question_string;
+        mg.messages.create("sandbox37aca15d55444736955d58b502031cba.mailgun.org", {
+          from: "Rankr <postmaster@sandbox37aca15d55444736955d58b502031cba.mailgun.org>",
+          to: [/*"aden.collinge@gmail.com",*/ "andreaafinlay@gmail.com"],
+          subject: "Rankr: Someone Has Voted In Your Poll!",
+          html: `<HTML><head></head><body><div>Someone has voted
+                      in your poll, ${pollQuestion}!</div>
+                 <div>You can view your poll at: </div>
+                 <div>Your secret key is: .</div>
+                 <div>Enter your poll URL plus your secret key into the address bar
+                 to view the current results of your poll: </div></body></HTML>`
+        })
+      })
+    })
+  }
+
+votePromise()
+  .then(() => {
+    findPollPromise(pollId)
+  })
+  .catch(err => console.log(err));
 });
 
-app.post('/polls/:poll_id',(req,res) =>{
-  Object.keys(req.body.options).forEach( option => {
-    knex('vote')
-  .insert({voter_name: 'Michael', option_id: req.body.options[option].option, rank: req.body.options[option].index})
-  .then( () => {
-    console.log('should be in there!')
-  })
-  .catch((e) => {
-    console.log(e)
-  })
-
-
-    // console.log('option',req.body.options[option].option, 'index',req.body.options[option].index)
-
-
-
-
-
-
-  });
-  //console.log("got it ty!", req.body.options)
-})
-
-
 app.post('/polls',(req,res) => {
+
   const templateVars = {};
+
     function generateSecretKey() {
   return Math.floor((1 + Math.random()) * 0x1000000).toString(16).substring(1);
   };
@@ -112,7 +127,7 @@ app.post('/polls',(req,res) => {
         .insert({email:'alice@gmail.com'})
         .returning('id')
         .then((creator_id) => resolve(creator_id))
-        .catch(err => reject(err));
+        .catch(e => reject(e));
       });
   };
 
@@ -147,14 +162,14 @@ creatorPromise()
   .then((creator_id) => pollPromise(creator_id))
   .then((poll_id) => optionPromise(poll_id))
   .then( () => {
-    const emailPollURL   = `http://localhost:8080/polls/${templateVars.poll_id}`
-    const emailPollHTML  = emailPollURL.link(emailPollURL);
-    const emailAdminURL  = `http://localhost:8080/polls/${templateVars.poll_id}/${templateVars.secretkey}`
-    const emailAdminHTML = emailAdminURL.link(emailAdminURL);
+    let emailPollURL   = `http://localhost:8080/polls/${templateVars.poll_id}`
+    let emailPollHTML  = emailPollURL.link(emailPollURL);
+    let emailAdminURL  = `http://localhost:8080/polls/${templateVars.poll_id}/${templateVars.secretkey}`
+    let emailAdminHTML = emailAdminURL.link(emailAdminURL);
     res.send(templateVars);
     mg.messages.create("sandbox37aca15d55444736955d58b502031cba.mailgun.org", {
       from: "Rankr <postmaster@sandbox37aca15d55444736955d58b502031cba.mailgun.org>",
-      to: ["aden.collinge@gmail.com", "andreaafinlay@gmail.com"],
+      to: [/*"aden.collinge@gmail.com",*/ "andreaafinlay@gmail.com"],
       subject: "Rankr: Your New Poll!",
       html: `<HTML><head></head><body><div>Your poll, ${templateVars.question_string},
               has been successfully created!</div>

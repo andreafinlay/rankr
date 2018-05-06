@@ -1,8 +1,5 @@
  $(() => {
 
-console.log("hello")
-
-
   $('#submit-vote').on('click', function() {
     const voteData = {};
     const pollid = $('#question').data('pollid');
@@ -15,7 +12,7 @@ console.log("hello")
         :voteData['options'] = [{option, index}];
       //SQL INJECTION ISSUE ? FIX  HOW ?
     });
-console.log('asdfadsfasdf',voteData);
+    
 //not geting right suff !!
     $.ajax({
       url: "/polls/" + pollid,
