@@ -6,8 +6,10 @@ const PORT        = process.env.PORT || 8080;
 const ENV         = process.env.ENV || "development";
 const express     = require("express");
 const bodyParser  = require("body-parser");
+const mailgun     = require('mailgun.js');
 const sass        = require("node-sass-middleware");
 const app         = express();
+const mg          = mailgun.client({username: 'api', key: process.env.MAILGUN_API_KEY || 'key-yourkeyhere'});
 
 const knexConfig  = require("./knexfile");
 const knex        = require("knex")(knexConfig[ENV]);
@@ -38,25 +40,8 @@ app.use("/styles", sass({
 app.use(express.static("public"));
 
 
-//--------------------helper__________--------------
-// function zeroIndexBorda(votes){
-//   console.log('here',votes)
-//   var options_length = 3;
-//   var num_of_votes = votes.length;
-//   //console.log(votes.length);
-//   var results = {};
-//   votes.forEach(vote => {
-//     results[vote.option_name] ?
-//     results[vote.option_name] += Number(vote.rank)
-//     :results[vote.option_name] = Number(vote.rank)
-//   });
-//  // console.log('raw results:',results);
-//   return Object.keys(results).reduce((prev, cur) => {
-//    prev[cur] = ((results[cur])/votes.length*100);
-//    return prev;
-// }, {});
-// }
 
+//--------------------helper--------------
 function zeroIndexBorda(votes){
   var options = {};
   var num_of_votes = votes.length;
@@ -73,14 +58,9 @@ function zeroIndexBorda(votes){
   return Object.keys(results).reduce((prev, cur) => {
    prev[cur] = ((results[cur]))*100;
    return prev;
-}, {});
+ }, {});
 }
 
-
-//---------------------–––––––--
-// Mount all resource routes
-
-// app.use("/api/users", usersRoutes(knex));
 
 app.use("/api/polls", pollRoutes(knex));
 
@@ -118,8 +98,7 @@ app.post('/polls/:poll_id',(req,res) =>{
 })
 
 
-app.post('/polls',(req,res) =>{
-  console.log(req.body)
+app.post('/polls',(req,res) => {
   const templateVars = {};
     function generateSecretKey() {
   return Math.floor((1 + Math.random()) * 0x1000000).toString(16).substring(1);
@@ -150,33 +129,47 @@ app.post('/polls',(req,res) =>{
             resolve(poll_id)
           })
            .catch(e => reject(e));
-    });
+      });
   };
 
   function optionPromise (poll_id){
-    return new Promise((resolve, reject) =>{
+    return new Promise((resolve, reject) => {
       req.body.options.forEach((option, i) => {
         knex('option')
         .insert({option_name: option[0], poll_id: Number(poll_id[0]) }).catch(err => console.log(err))
         .then(resolve())
         .catch(e => reject(e));
-    });
-  })
+      });
+    })
   };
-
 
 creatorPromise()
   .then((creator_id) => pollPromise(creator_id))
   .then((poll_id) => optionPromise(poll_id))
   .then( () => {
-    console.log(templateVars)
-    res.send(templateVars)
+    const emailPollURL   = `http://localhost:8080/polls/${templateVars.poll_id}`
+    const emailPollHTML  = emailPollURL.link(emailPollURL);
+    const emailAdminURL  = `http://localhost:8080/polls/${templateVars.poll_id}/${templateVars.secretkey}`
+    const emailAdminHTML = emailAdminURL.link(emailAdminURL);
+    res.send(templateVars);
+    mg.messages.create("sandbox37aca15d55444736955d58b502031cba.mailgun.org", {
+      from: "Rankr <postmaster@sandbox37aca15d55444736955d58b502031cba.mailgun.org>",
+      to: ["aden.collinge@gmail.com", "andreaafinlay@gmail.com"],
+      subject: "Rankr: Your New Poll!",
+      html: `<HTML><head></head><body><div>Your poll, ${templateVars.question_string},
+              has been successfully created!</div>
+             <div>You can view your new poll at: ${emailPollHTML}</div>
+             <div>Your secret key is: ${templateVars.secretkey}.</div>
+             <div>Enter your poll URL plus your secret key into the address bar
+             to view the results of your poll: ${emailAdminHTML}</div></body></HTML>`
+    })
+    .then(msg => console.log(msg))
+    .catch(err => console.log(err));
   })
   .catch(e => {console.log(e)})
-
 });
 
-//*********__________-------------------polls results doesnt wokr
+// Polls results, doesn't work
 app.get("/polls/:poll_id/results", (req, res) => {
 
   console.log(req.params.poll_id);
@@ -193,23 +186,7 @@ app.get("/polls/:poll_id/results", (req, res) => {
     console.log(zeroIndexBorda(results))
     templateVars['results'] = zeroIndexBorda(results)
     res.render("admin", templateVars);
-
-
-
-
-    // return new Promise((res,rej) => {
-    //   knex
-    //     .select('poll_id','vote.rank','vote.voter_name','option.option_name')
-    //     .from("poll")
-    //     .join('option', 'poll.id', 'option.poll_id')
-    //     .join('vote','vote.option_id','option.id')
-    //     .where('poll.id', req.params.poll_id)
-    // })
   });
-
-      // console.log(results);
-   // templateVars['results'] = results;
-
 });
 
 // Poll page
@@ -224,8 +201,9 @@ app.get("/polls/:poll_id/", (req, res) => {
      res.render("poll", {results: results})
   });
 });
+
 //Poll admin
-app.get("/admin/:poll_id", (req, res) => {
+app.get("/polls/:poll_id/:secretkey", (req, res) => {
   res.render("admin");
 });
 
