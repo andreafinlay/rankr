@@ -40,7 +40,7 @@ app.use("/styles", sass({
 app.use(express.static("public"));
 
 
-//--------------------helper__________--------------
+//--------------------helper--------------
 function zeroIndexBorda(votes){
   console.log('here',votes)
   var options_length = 3;
@@ -52,17 +52,11 @@ function zeroIndexBorda(votes){
     results[vote.option_name] += Number(vote.rank)
     :results[vote.option_name] = Number(vote.rank)
   });
- // console.log('raw results:',results);
   return Object.keys(results).reduce((prev, cur) => {
    prev[cur] = ((results[cur])/votes.length*100);
    return prev;
-}, {});
+ }, {});
 }
-
-//---------------------–––––––--
-// Mount all resource routes
-
-// app.use("/api/users", usersRoutes(knex));
 
 app.use("/api/polls", pollRoutes(knex));
 
@@ -148,7 +142,7 @@ creatorPromise()
   .catch(e => {console.log(e)})
 });
 
-//*********__________-------------------polls results doesnt wokr
+// Polls results, doesn't work
 app.get("/polls/:poll_id/results", (req, res) => {
 
   console.log(req.params.poll_id);
@@ -164,26 +158,8 @@ app.get("/polls/:poll_id/results", (req, res) => {
 
     templateVars['results'] = zeroIndexBorda(results)
     res.render("admin", templateVars);
-
-
-
-
-    // return new Promise((res,rej) => {
-    //   knex
-    //     .select('poll_id','vote.rank','vote.voter_name','option.option_name')
-    //     .from("poll")
-    //     .join('option', 'poll.id', 'option.poll_id')
-    //     .join('vote','vote.option_id','option.id')
-    //     .where('poll.id', req.params.poll_id)
-    // })
   });
-
-      // console.log(results);
-   // templateVars['results'] = results;
-
 });
-
-
 
 // Poll page
 app.get("/polls/:poll_id/", (req, res) => {
@@ -197,8 +173,9 @@ app.get("/polls/:poll_id/", (req, res) => {
      res.render("poll", {results: results})
   });
 });
+
 //Poll admin
-app.get("/admin/:poll_id", (req, res) => {
+app.get("/polls/:poll_id/:secretkey", (req, res) => {
   res.render("admin");
 });
 
