@@ -66,21 +66,22 @@ $(() => {
       const option = $(el).text();
 
       pollData['options'] ?
-        pollData['options'].push({[index]: option})
-        :pollData['options'] = [{[index]: option}];
+      pollData['options'].push({[index]: option})
+      :pollData['options'] = [{[index]: option}];
 
       //SQL INJECTION ISSUE ? FIX  HOW ?
       pollData['email'] = $('#email').val();
       pollData['question_string'] = $('#pollQuestion').val();
     });
 
+
     $.ajax({
       url: "/polls",
       method: "post",
       data: pollData,
       success: function(templateVars) {
-        $('#pollEverything ').empty();
-        $('#pollEverything').append(createPollCreatedMessage(templateVars));
+        $('#createPollEverything').empty();
+        $('#createPollEverything').append(createPollCreatedMessage(templateVars));
       }
     });
   });

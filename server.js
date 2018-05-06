@@ -2,14 +2,18 @@
 
 require('dotenv').config();
 
-const PORT        = process.env.PORT || 8080;
-const ENV         = process.env.ENV || "development";
-const express     = require("express");
-const bodyParser  = require("body-parser");
-const mailgun     = require('mailgun.js');
-const sass        = require("node-sass-middleware");
-const app         = express();
-const mg          = mailgun.client({username: 'api', key: process.env.MAILGUN_API_KEY || 'key-yourkeyhere'});
+const PORT         = process.env.PORT || 8080;
+const ENV          = process.env.ENV || "development";
+const twilioSid    = process.env.TWILIO_ACCT_SID;
+const twilioToken  = process.env.TWILIO_AUTH_TOKEN;
+const express      = require("express");
+const bodyParser   = require("body-parser");
+const mailgun      = require("mailgun.js");
+const sass         = require("node-sass-middleware");
+const twilio       = require("twilio");
+const twilioClient = new twilio(twilioSid, twilioToken);
+const app          = express();
+const mg           = mailgun.client({username: 'api', key: process.env.MAILGUN_API_KEY || 'key-yourkeyhere'});
 
 const knexConfig  = require("./knexfile");
 const knex        = require("knex")(knexConfig[ENV]);
@@ -83,7 +87,7 @@ app.get("/polls/:poll_id/:secret_key", (req, res) => {
     console.log(req.params.secret_key,results[0].key)
       if(req.params.secret_key == results[0].key){
         templateVars['results'] = zeroIndexBorda(results);
-        templateVars['quesiton']    = results[0].question_string;
+        templateVars['question']    = results[0].question_string;
         res.render("admin", templateVars);
       }
       else{
@@ -148,19 +152,26 @@ creatorPromise()
     let emailAdminURL  = `http://localhost:8080/polls/${templateVars.poll_id}/${templateVars.secretkey}`
     let emailAdminHTML = emailAdminURL.link(emailAdminURL);
     res.send(templateVars);
-    // mg.messages.create("sandbox37aca15d55444736955d58b502031cba.mailgun.org", {
-    //   from: "Rankr <postmaster@sandbox37aca15d55444736955d58b502031cba.mailgun.org>",
-    //   to: [/*"aden.collinge@gmail.com",*/ "andreaafinlay@gmail.com"],
-    //   subject: "Rankr: Your New Poll!",
-    //   html: `<HTML><head></head><body><div>Your poll, ${templateVars.question_string},
-    //           has been successfully created!</div>
-    //          <div>You can view your new poll at: ${emailPollHTML}</div>
-    //          <div>Your secret key is: ${templateVars.secretkey}.</div>
-    //          <div>Enter your poll URL plus your secret key into the address bar
-    //          to view the results of your poll: ${emailAdminHTML}</div></body></HTML>`
-    // })
-    // .then(msg => console.log(msg))
-    // .catch(err => console.log(err));
+    mg.messages.create("sandbox37aca15d55444736955d58b502031cba.mailgun.org", {
+      from: "Rankr <postmaster@sandbox37aca15d55444736955d58b502031cba.mailgun.org>",
+      to: ["aden.collinge@gmail.com", "andreaafinlay@gmail.com"],
+      subject: "Rankr: Your New Poll!",
+      html: `<HTML><head></head><body><div>Your poll, ${templateVars.question_string},
+              has been successfully created!</div>
+             <div>You can view your new poll at: ${emailPollHTML}</div>
+             <div>Your secret key is: ${templateVars.secretkey}</div>
+             <div>Enter your poll URL plus your secret key into the address bar
+             to view the results of your poll: ${emailAdminHTML}</div></body></HTML>`
+    })
+    .then(msg => console.log(msg))
+    .catch(err => console.log(err));
+  }).then( () => {
+    twilioClient.messages.create({
+        body: 'Get Rank\'d',
+        to: '+15143478581',
+        from: '+15146133217'
+    })
+    .then((message) => console.log(message.body.slice(38), message.sid))
   })
   .catch(e => {console.log(e)})
 });
@@ -184,23 +195,28 @@ app.post('/polls/:poll_id',(req,res) => {
     });
   }
 
-  function findPollPromise() {
+  function sendVoteEmailPromise() {
     return new Promise((resolve, reject) => {
       knex('poll').where({
         id: pollId
-      }).select('question_string')
-        .then(function(question_string) {
-        const pollQuestion = question_string[0].question_string;
+      }).select('question_string', 'id', 'key')
+        .then(function(results) {
+        const emailPollURL   = `http://localhost:8080/polls/${results[0].id}`
+        const emailPollHTML  = emailPollURL.link(emailPollURL);
+        const emailAdminURL  = `http://localhost:8080/polls/${results[0].id}/${results[0].key}`
+        const emailAdminHTML = emailAdminURL.link(emailAdminURL);
+        const pollQuestion = results[0].question_string;
         mg.messages.create("sandbox37aca15d55444736955d58b502031cba.mailgun.org", {
           from: "Rankr <postmaster@sandbox37aca15d55444736955d58b502031cba.mailgun.org>",
-          to: [/*"aden.collinge@gmail.com",*/ "andreaafinlay@gmail.com"],
+          to: ["aden.collinge@gmail.com", "andreaafinlay@gmail.com"],
           subject: "Rankr: Someone Has Voted In Your Poll!",
-          html: `<HTML><head></head><body><div>Someone has voted
-                      in your poll, ${pollQuestion}!</div>
-                 <div>You can view your poll at: </div>
-                 <div>Your secret key is: .</div>
+          html: `<HTML><head></head><body><div>Someone has voted in your poll, ${pollQuestion}!</div>
+                 <div>You can view your poll at: ${emailPollHTML}</div>
+                 <div>Your secret key is: ${results[0].key}</div>
                  <div>Enter your poll URL plus your secret key into the address bar
-                 to view the current results of your poll: </div></body></HTML>`
+                 to view the current results of your poll: ${emailAdminHTML}</div></body></HTML>`
+        }).then(() => {
+          res.send({pollQuestion: results[0].question_string});
         })
       })
     })
@@ -208,8 +224,7 @@ app.post('/polls/:poll_id',(req,res) => {
 
 votePromise()
   .then(() => {
-    console.log("i could totally send an email if i wanted to, i swear.")
-    // findPollPromise(pollId)
+    sendVoteEmailPromise(pollId)
   })
   .catch(err => console.log(err));
 });
