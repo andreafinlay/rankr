@@ -73,7 +73,6 @@ app.get("/polls/:poll_id/", (req, res) => {
 // Admin page, need to change link name to incl secretkey
 app.get("/polls/:poll_id/:secret_key", (req, res) => {
   const templateVars = {};
-
   knex
    .select('poll.key','poll.question_string','vote.id','poll_id','key','vote.rank','vote.voter_name','option.option_name','vote.option_id')
    .from("poll")
