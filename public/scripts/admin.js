@@ -1,5 +1,17 @@
-(() => {
+$(() => {
+  $('#borda').on('click', e =>{
 
-console.log("here")
+    var id = $('#question').data('id');
+    console.log(id)
 
-})
+  $.ajax({
+    method: "GET",
+    url: ""+"/"+id
+  }).done((users) => {
+
+      $("<div>").text("hi").appendTo($("body"));
+
+  });
+
+  })
+});

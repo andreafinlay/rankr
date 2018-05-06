@@ -74,21 +74,23 @@ app.get("/polls/:poll_id/", (req, res) => {
 app.get("/polls/:poll_id/:secret_key", (req, res) => {
   const templateVars = {};
   knex
-   .select('poll.key','poll.question_string','vote.id','poll_id','key','vote.rank','vote.voter_name','option.option_name','vote.option_id')
+   .select('poll.key','poll.question_string','poll_id','key','option.option_name')
    .from("poll")
    .join('option', 'poll.id', 'option.poll_id')
-   .join('vote','vote.option_id','option.id')
    .where('poll.id', req.params.poll_id)
    .then((results) => {
-    console.log(req.params.secret_key,results[0].key)
-      if(req.params.secret_key == results[0].key){
+
+      console.log(results[0])
+
+
         templateVars['results'] = zeroIndexBorda(results);
         templateVars['quesiton']    = results[0].question_string;
+        templateVars['poll_id'] = results[0].poll_id;
         res.render("admin", templateVars);
-      }
-      else{
-        res.send('error: 404 - <h1>nothing to see here.</h1')
-      }
+    //   }
+      // else{
+       // res.send('error: 404 - <h1>nothing to see here.</h1')
+      // }
   });
 });
 
