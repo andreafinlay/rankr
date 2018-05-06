@@ -70,8 +70,8 @@ app.get("/polls/:poll_id/", (req, res) => {
   });
 });
 
-// Admin page
-app.get("/polls/:poll_id/:key", (req, res) => {
+// Admin page, need to change link name to incl secretkey
+app.get("/polls/:poll_id/results", (req, res) => {
   const templateVars = {};
 
   knex
@@ -81,8 +81,9 @@ app.get("/polls/:poll_id/:key", (req, res) => {
    .join('vote','vote.option_id','option.id')
    .where('poll.id', req.params.poll_id)
    .then((results) => {
-    templateVars['results'] = zeroIndexBorda(results)
-    templateVars['key']     = results[0].key;
+
+    templateVars['results'] = zeroIndexBorda(results);
+    // templateVars['key']     = results[0].key;
     res.render("admin", templateVars);
   });
 });
@@ -91,7 +92,7 @@ app.get("/polls/:poll_id/:key", (req, res) => {
 app.post('/polls',(req,res) => {
   const templateVars = {};
 
-  function generateSecretKey() {
+    function generateSecretKey() {
   return Math.floor((1 + Math.random()) * 0x1000000).toString(16).substring(1);
   };
 
