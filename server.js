@@ -70,6 +70,23 @@ app.get("/polls/:poll_id/", (req, res) => {
   });
 });
 
+
+app.get("/polls/:poll_id/:secret_key/data", (req, res) => {
+  console.log("here");
+    knex
+ .select('poll.key','poll.question_string','vote.id','poll_id','key','vote.rank','vote.voter_name','option.option_name','vote.option_id')
+   .from("poll")
+   .join('option', 'poll.id', 'option.poll_id')
+   .join('vote','vote.option_id','option.id')
+   .where('poll.id', req.params.poll_id)
+   .then((results) => {
+    console.log(results)
+      res.send(results);
+    }).catch(e=>{
+      res.send('<h1>you do not have any results </h1>')
+    })
+
+ })
 // Admin page, need to change link name to incl secretkey
 app.get("/polls/:poll_id/:secret_key", (req, res) => {
   const templateVars = {};
@@ -79,18 +96,17 @@ app.get("/polls/:poll_id/:secret_key", (req, res) => {
    .join('option', 'poll.id', 'option.poll_id')
    .where('poll.id', req.params.poll_id)
    .then((results) => {
-
+        if(req.params.secret_key == results[0].key){
       console.log(results[0])
-
-
         templateVars['results'] = zeroIndexBorda(results);
         templateVars['quesiton']    = results[0].question_string;
         templateVars['poll_id'] = results[0].poll_id;
+        templateVars['key'] = results[0].key;
         res.render("admin", templateVars);
-    //   }
-      // else{
-       // res.send('error: 404 - <h1>nothing to see here.</h1')
-      // }
+      }
+      else{
+       res.send('error: 404 - <h1>nothing to see here</h1')
+      }
   });
 });
 

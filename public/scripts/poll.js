@@ -12,7 +12,7 @@
         :voteData['options'] = [{option, index}];
       //SQL INJECTION ISSUE ? FIX  HOW ?
     });
-    
+
 //not geting right suff !!
     $.ajax({
       url: "/polls/" + pollid,
@@ -20,7 +20,8 @@
       datatype: 'json',
       data: voteData,
       success: function(templateVars) {
-        $('#pollEverything ').empty();
+        console.log('success')
+        $('#pollEverything').empty();
         $('#pollEverything').append(createPollCreatedMessage(templateVars));
       }
     });
