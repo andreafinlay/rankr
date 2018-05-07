@@ -4,6 +4,8 @@ Rankr is a full-stack application for collecting and ranking votes. :bar_chart:
 
 Rankr uses the [Borda count](https://en.wikipedia.org/wiki/Borda_count) method to tally and rank votes, and auto-updates the admin page as the votes come in for real-time results.
 
+Users who create a poll can be notified with an email and SMS message upon poll creation that includes links to view the poll and view the poll results. Emails and SMS messages can also be sent whenever a new vote is submitted to an existing poll.
+
 This app was built using HTML, CSS, JS, and [jQuery](https://jquery.com/)/AJAX on the front-end, and [Node](https://nodejs.org/en/), [Express](https://expressjs.com/), and [postgreSQL](https://www.postgresql.org/) on the back-end.
 
 ## Final Product
