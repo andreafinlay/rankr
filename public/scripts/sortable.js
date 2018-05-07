@@ -4,6 +4,7 @@ $(() => {
 
   const pollOptionList = Sortable.create(pollContainer, {
     filter: ".js-remove",
+    animation: 150,
     onFilter: function (evt) {
       const el = pollOptionList.closest(evt.item);
       el && el.remove(pollOption);

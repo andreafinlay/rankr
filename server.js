@@ -219,23 +219,23 @@ app.post('/polls/:poll_id',(req,res) => {
         id: pollId
       }).select('question_string', 'id', 'key')
         .then(function(results) {
-        const emailPollURL   = `http://localhost:8080/polls/${results[0].id}`
-        const emailPollHTML  = emailPollURL.link(emailPollURL);
-        const emailAdminURL  = `http://localhost:8080/polls/${results[0].id}/${results[0].key}`
-        const emailAdminHTML = emailAdminURL.link(emailAdminURL);
-        const pollQuestion = results[0].question_string;
-        mg.messages.create("sandbox37aca15d55444736955d58b502031cba.mailgun.org", {
-          from: "Rankr <postmaster@sandbox37aca15d55444736955d58b502031cba.mailgun.org>",
-          to: ["aden.collinge@gmail.com", "andreaafinlay@gmail.com"],
-          subject: "Rankr: Someone Has Voted In Your Poll!",
-          html: `<HTML><head></head><body><div>Someone has voted in your poll, ${pollQuestion}!</div>
-                 <div>You can view your poll at: ${emailPollHTML}</div>
-                 <div>Your secret key is: ${results[0].key}</div>
-                 <div>Enter your poll URL plus your secret key into the address bar
-                 to view the current results of your poll: ${emailAdminHTML}</div></body></HTML>`
-        }).then(() => {
-          res.send({pollQuestion: results[0].question_string});
-        })
+        // const emailPollURL   = `http://localhost:8080/polls/${results[0].id}`
+        // const emailPollHTML  = emailPollURL.link(emailPollURL);
+        // const emailAdminURL  = `http://localhost:8080/polls/${results[0].id}/${results[0].key}`
+        // const emailAdminHTML = emailAdminURL.link(emailAdminURL);
+        // const pollQuestion = results[0].question_string;
+        // mg.messages.create("sandbox37aca15d55444736955d58b502031cba.mailgun.org", {
+        //   from: "Rankr <postmaster@sandbox37aca15d55444736955d58b502031cba.mailgun.org>",
+        //   to: ["aden.collinge@gmail.com", "andreaafinlay@gmail.com"],
+        //   subject: "Rankr: Someone Has Voted In Your Poll!",
+        //   html: `<HTML><head></head><body><div>Someone has voted in your poll, ${pollQuestion}!</div>
+        //          <div>You can view your poll at: ${emailPollHTML}</div>
+        //          <div>Your secret key is: ${results[0].key}</div>
+        //          <div>Enter your poll URL plus your secret key into the address bar
+        //          to view the current results of your poll: ${emailAdminHTML}</div></body></HTML>`
+        // }).then(() => {
+        //   res.send({pollQuestion: results[0].question_string});
+        // })
       })
     })
   }
