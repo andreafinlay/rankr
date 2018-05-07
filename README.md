@@ -9,13 +9,13 @@ This app was built using HTML, CSS, JS, and [jQuery](https://jquery.com/)/AJAX o
 ## Final Product
 
 Creating a new poll
-!["Create poll"](https://github.com/aunomy/rankr/blob/master/docs/create-poll.gif?raw=true)
+!["Create poll"](https://github.com/aunomy/rankr/blob/master/docs/create-poll-small.gif?raw=true)
 
 Voting in a poll
-!["Vote in poll"](https://github.com/aunomy/rankr/blob/master/docs/vote-in-poll.gif?raw=true)
+!["Vote in poll"](https://github.com/aunomy/rankr/blob/master/docs/vote-in-poll-small.gif?raw=true)
 
 Viewing the results of the poll
-!["View results"](https://github.com/aunomy/rankr/blob/master/docs/view-results.gif?raw=true)
+!["View results"](https://github.com/aunomy/rankr/blob/master/docs/view-results-small.gif?raw=true)
 
 ## Getting Started
 
