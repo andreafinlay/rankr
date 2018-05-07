@@ -16,11 +16,16 @@ $(() => {
     const $newOptionRow     = $("<tr>").addClass("optionRow");
     const $optionColumn     = $("<td>").addClass("optionColumn");
     const $deleteColumn     = $("<td>").addClass("deleteColumn");
-    const $newOptionContent = $("#addNewText").val();
-    const $deleteButton     = $("<button>").text("Delete").addClass("btn btn-primary js-remove");
+    const $handle           = $("<i>").addClass("handle fas fa-bars");
+    const $newOptionContent = " " + $("#addNewText").val();
+    const $newOptionSpan    = $("<span>").addClass("newOption");
+    const $deleteButton     = $("<button>").text("Delete").addClass("btn btn-danger js-remove");
 
-    $optionColumn.append($newOptionContent);
+    $optionColumn.append($handle);
+    $newOptionSpan.append($newOptionContent);
+    $optionColumn.append($newOptionSpan);
     $deleteColumn.append($deleteButton);
+
     $newOptionRow.append($optionColumn);
     $newOptionRow.append($deleteColumn);
     $newOptionRow.append($newOption);
@@ -37,9 +42,9 @@ $(() => {
     const pollLinkText        = "Visit or share this link to vote in your poll: ";
     const pollLinkURL         = $("<a>").attr("href", pollLink).text(pollLink);
     const adminLink           = "http://localhost:8080/polls/" + pollID + "/" + secretKey;
-    const adminText           = "Add the secret key to the poll url to see the results of your poll: ";
+    const adminText           = "Add your secret key your new poll's URL to see the results of your poll: ";
     const adminURL            = $("<a>").attr("href", adminLink).text(adminLink);
-    const $successMessage     = $("<strong>").text("Thanks for creating your poll: " + questionString + "!");
+    const $successMessage     = $("<strong>").text("Success! 📊 Thanks for creating your poll: " + questionString);
     const $secretKeyMessage   = $("<div>").addClass("secretKey").text("Your secret key: " + secretKey);
     const $pollLinkMessage    = $("<div>").addClass("pollLink").text(pollLinkText);
     const $adminLinkMessage   = $("<div>").addClass("adminLink").text(adminText);

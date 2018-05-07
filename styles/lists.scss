@@ -7,14 +7,11 @@ body {
   cursor: -webkit-grabbing;
 }
 
-#pollContainer {
-  padding: 5px;
-  border: 1px black;
-  border-style: solid;
-  border-radius: 3px;
+.handle {
+	cursor: move;
+	cursor: -webkit-grabbing;
 }
 
-// .my-handle {
-// 	cursor: move;
-// 	cursor: -webkit-grabbing;
-// }
+.resultBar {
+  border: 1px outset black;
+}

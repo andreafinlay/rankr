@@ -4,9 +4,9 @@
      const $pollVotedMessage = $("<div>").addClass("alert alert-info");
      const pollQuestion      = data.pollQuestion;
      const url               = "http://localhost:8080/";
-     const $link             = $("<a>").attr("href", url).text("create a poll");
-     const $text             = $("<div>").text("Thanks for completing this poll: " + pollQuestion + "!")
-     const $text2            = $("<div>").text("Follow this link to return to the homepage and create your own poll: ")
+     const $link             = $("<a>").attr("href", url).text("Click here make a new poll!");
+     const $text             = $("<div>").text("Success! ✔️ You have just completed the poll: " + pollQuestion)
+     const $text2            = $("<div>")
 
      $text2.append($link);
 

@@ -91,7 +91,7 @@ app.get("/polls/:poll_id/:secret_key/data", (req, res) => {
     })
 
  })
-// Admin page, need to change link name to incl secretkey
+// Admin page
 app.get("/polls/:poll_id/:secret_key", (req, res) => {
   const templateVars = {};
   knex
@@ -109,7 +109,7 @@ app.get("/polls/:poll_id/:secret_key", (req, res) => {
         res.render("admin", templateVars);
       }
       else{
-       res.send('error: 404 - <h1>nothing to see here</h1')
+       res.send('Error: 404 - Nothing to see here')
       }
   });
 });
@@ -172,7 +172,7 @@ creatorPromise()
     res.send(templateVars);
     mg.messages.create("sandbox37aca15d55444736955d58b502031cba.mailgun.org", {
       from: "Rankr <postmaster@sandbox37aca15d55444736955d58b502031cba.mailgun.org>",
-      to: ["aden.collinge@gmail.com", "andreaafinlay@gmail.com"],
+      to: [/*"aden.collinge@gmail.com"*/, "andreaafinlay@gmail.com"],
       subject: "Rankr: Your New Poll!",
       html: `<HTML><head></head><body><div>Your poll, ${templateVars.question_string},
               has been successfully created!</div>
@@ -243,7 +243,7 @@ votePromise()
     const pollQuestion   = data.pollQuestion;
     mg.messages.create("sandbox37aca15d55444736955d58b502031cba.mailgun.org", {
       from: "Rankr <postmaster@sandbox37aca15d55444736955d58b502031cba.mailgun.org>",
-      to: ["aden.collinge@gmail.com", "andreaafinlay@gmail.com"],
+      to: [/*"aden.collinge@gmail.com"*/, "andreaafinlay@gmail.com"],
       subject: "Rankr: Someone Has Voted In Your Poll!",
       html: `<HTML><head></head><body><div>Someone has voted in your poll, ${pollQuestion}!</div>
              <div>You can view your poll at: ${emailPollHTML}</div>
@@ -256,7 +256,7 @@ votePromise()
       const pollQuestion = data.pollQuestion;
       twilioClient.messages.create({
           body: `Rankr: Someone has voted in your poll, ${pollQuestion}!\nYou can view your new poll at: ${SMSPollURL}\nYour secret key is: ${data.key}\nEnter your poll URL plus your secret key into the address bar to view the results of your poll: ${SMSAdminURL}`,
-          to: ['+15143478581', '+15148081734'],
+          to: ['+15143478581'],
           from: '+15146133217'
       })
     })
@@ -265,5 +265,5 @@ votePromise()
 });
 
 app.listen(PORT, () => {
-  console.log("Example app listening on port " + PORT);
+  console.log("Rankr listening on port " + PORT);
 });
