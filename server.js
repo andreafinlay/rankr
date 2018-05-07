@@ -187,7 +187,7 @@ creatorPromise()
     let emailPollURL   = `http://localhost:8080/polls/${templateVars.poll_id}`
     let emailAdminURL  = `http://localhost:8080/polls/${templateVars.poll_id}/${templateVars.secretkey}`
     twilioClient.messages.create({
-        body: `Rankr: Your poll, ${templateVars.question_string}, has been successfully created!\nYou can view your new poll at: ${emailPollURL}.\nYour secret key is: ${templateVars.secretkey}\nEnter your poll URL plus your secret key into the address bar to view the results of your poll: ${emailAdminURL}`,
+        body: `Rankr: Your poll, ${templateVars.question_string}, has been successfully created!\nYou can view your new poll at: ${emailPollURL}\nYour secret key is: ${templateVars.secretkey}\nEnter your poll URL plus your secret key into the address bar to view the results of your poll: ${emailAdminURL}`,
         to: '+15143478581',
         from: '+15146133217'
     })
@@ -199,6 +199,7 @@ creatorPromise()
 // Posting votes from poll page
 app.post('/polls/:poll_id',(req,res) => {
   const pollId = (req.params.poll_id);
+  const data   = {};
 
   function votePromise() {
     return new Promise((resolve, reject) => {
@@ -208,7 +209,7 @@ app.post('/polls/:poll_id',(req,res) => {
       .returning('id')
       .then(()=> {
         console.log('should be in the db')
-        resolve()
+        resolve(pollId)
       })
       .catch(e => reject(e));
       });
@@ -220,31 +221,44 @@ app.post('/polls/:poll_id',(req,res) => {
       knex('poll').where({
         id: pollId
       }).select('question_string', 'id', 'key')
-        .then(function(results) {
-        const emailPollURL   = `http://localhost:8080/polls/${results[0].id}`
-        const emailPollHTML  = emailPollURL.link(emailPollURL);
-        const emailAdminURL  = `http://localhost:8080/polls/${results[0].id}/${results[0].key}`
-        const emailAdminHTML = emailAdminURL.link(emailAdminURL);
-        const pollQuestion = results[0].question_string;
-        mg.messages.create("sandbox37aca15d55444736955d58b502031cba.mailgun.org", {
-          from: "Rankr <postmaster@sandbox37aca15d55444736955d58b502031cba.mailgun.org>",
-          to: ["aden.collinge@gmail.com", "andreaafinlay@gmail.com"],
-          subject: "Rankr: Someone Has Voted In Your Poll!",
-          html: `<HTML><head></head><body><div>Someone has voted in your poll, ${pollQuestion}!</div>
-                 <div>You can view your poll at: ${emailPollHTML}</div>
-                 <div>Your secret key is: ${results[0].key}</div>
-                 <div>Enter your poll URL plus your secret key into the address bar
-                 to view the current results of your poll: ${emailAdminHTML}</div></body></HTML>`
-        }).then(() => {
+        .then((results) => {
+          data.pollQuestion = results[0].question_string;
+          data.id = results[0].id;
+          data.key = results[0].key;
           res.send({pollQuestion: results[0].question_string});
+          resolve(results);
         })
       })
-    })
-  }
+    }
 
 votePromise()
-  .then(() => {
-    sendVoteEmailPromise(pollId)
+
+  .then((pollId) => sendVoteEmailPromise(pollId))
+  .then((results) => {
+    const emailPollURL   = `http://localhost:8080/polls/${data.id}`
+    const emailPollHTML  = emailPollURL.link(emailPollURL);
+    const emailAdminURL  = `http://localhost:8080/polls/${data.id}/${data.key}`
+    const emailAdminHTML = emailAdminURL.link(emailAdminURL);
+    const pollQuestion   = data.pollQuestion;
+    mg.messages.create("sandbox37aca15d55444736955d58b502031cba.mailgun.org", {
+      from: "Rankr <postmaster@sandbox37aca15d55444736955d58b502031cba.mailgun.org>",
+      to: ["aden.collinge@gmail.com", "andreaafinlay@gmail.com"],
+      subject: "Rankr: Someone Has Voted In Your Poll!",
+      html: `<HTML><head></head><body><div>Someone has voted in your poll, ${pollQuestion}!</div>
+             <div>You can view your poll at: ${emailPollHTML}</div>
+             <div>Your secret key is: ${data.key}</div>
+             <div>Enter your poll URL plus your secret key into the address bar
+             to view the current results of your poll: ${emailAdminHTML}</div></body></HTML>`
+    }).then((results) => {
+      const SMSPollURL   = `http://localhost:8080/polls/${data.id}`
+      const SMSAdminURL  = `http://localhost:8080/polls/${data.id}/${data.key}`
+      const pollQuestion = data.pollQuestion;
+      twilioClient.messages.create({
+          body: `Rankr: Someone has voted in your poll, ${pollQuestion}!\nYou can view your new poll at: ${SMSPollURL}\nYour secret key is: ${data.key}\nEnter your poll URL plus your secret key into the address bar to view the results of your poll: ${SMSAdminURL}`,
+          to: ['+15143478581', '+15148081734'],
+          from: '+15146133217'
+      })
+    })
   })
   .catch(err => console.log(err));
 });
