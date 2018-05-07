@@ -18,15 +18,15 @@
     <!-- <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script> -->
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
   </head>
-  <body>
+  <body >
     <header>
       <% include partials/_header %>
     </header>
 
-    <div id="votePollEverything">
+    <div id="votePollEverything" >
       <h1 id='question' data-pollid=<%=results[0].poll_id%>>Poll: <%=results[0].question_string%></h1>
 
-    <table class="table table-hover">
+    <table class="table table-hover table-bordered" >
       <thead>
         <label class="col-form-label">Poll options</label>
         <p>Drag the options to reorder them, first to last</p>
@@ -34,8 +34,8 @@
           <th>Option</th>
         </tr>
       </thead>
-      <tbody class="tableBody">
-        <% Object.keys(results).forEach(option => { %>
+      <tbody class="tableBody" style="background-color:white;">
+        <% Object.keys(results).forEach((option,i) => { %>
           <tr>
             <td class="optionColumn">
               <div class="pollOption" data-optionid=<%=results[option].option_id%>>

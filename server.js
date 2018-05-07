@@ -228,6 +228,7 @@ app.post('/polls/:poll_id',(req,res) => {
           res.send({pollQuestion: results[0].question_string});
           resolve(results);
         })
+
       })
     }
 

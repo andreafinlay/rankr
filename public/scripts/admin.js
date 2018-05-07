@@ -1,6 +1,6 @@
 $(() => {
 
-var colors = ['#deeaee','#b1cbbb','#eea29a','#c94c4c'];
+var colors = ['#deeaee', ,'#eea29a','#c94c4c','#6b5b95','#feb236','#d64161','#ff7b25'];
 
 function zeroIndexBorda(votes){
   const options = {};
@@ -15,41 +15,44 @@ function zeroIndexBorda(votes){
     results[vote.option_name] += Math.abs(Number(numOfQuestions - vote.rank))/num_of_votes
     :results[vote.option_name] = Math.abs(Number(numOfQuestions - vote.rank))/num_of_votes
   });
-  return Object.keys(results).reduce((prev, cur) => {
-   prev[cur] = ((results[cur]))*100;
-   return prev;
- }, {});
+  return Object.keys(results).map((key) => {
+   return [key, Math.floor(results[key]*100)]
+}).sort((a,b)=>{
+   return a[1] < b[1] ? 1 : -1
+})
 }
 
 
     var id = $('#question').data('id');
     var key = $('#question').data('key')
 
+  function getResults(){
     $.ajax({
-    method: "GET",
-    url: key +"/data"
-  }).done((data) => {
-    console.log(data)
-      if(data.length>0){
-        //$('body').append(JSON.stringify(data));
-        var bordaResult = zeroIndexBorda(data);
-        Object.keys(bordaResult).forEach((option, i)=>{
-         $('body').append('<p>'+option+'</p>')
-         $('body').append('<div style="background-color: '+(colors[i] ||'black')+'; width:'+bordaResult[option]+'%; height:30px"></div>')
-        })
+      method: "GET",
+      url: key +"/data",
+      complete: function (data) {
+                    // Schedule the next
+                    setTimeout(getResults, 3000);
+       }
+    }).done((data) => {
+ $('#restultsContainer').empty();
+      console.log(data)
+        if(data.length>0){
+          //$('body').append(JSON.stringify(data));
+          var bordaResult = zeroIndexBorda(data);
+          bordaResult.forEach((option, i)=>{
+           $('#restultsContainer').append('<p>'+option[0]+'</p>')
+           $('#restultsContainer').append('<div style="background-color: '+(colors[i] ||'black')+'; width:'+option[1]+'%; height:30px"></div>')
+          })
 
-      }else {
-        $('body').append('<p>no votes collected yet</p>');
-      }
-  }).fail(()=>{
-    alert("fail")
-  })
-
-
-  $('#borda').on('click', e =>{
-
-
-  })
+        }else {
+          $('#restultsContainer').append('<p>no votes collected yet</p>');
+        }
+    }).fail(()=>{
+      alert("fail")
+    })
+}
+getResults();
 });
 
 
