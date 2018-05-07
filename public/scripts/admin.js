@@ -1,6 +1,6 @@
 $(() => {
 
-var colors = ['#deeaee','#b1cbbb','#eea29a','#c94c4c','#6b5b95','#feb236','#d64161','#ff7b25'];
+var colors = ['#deeaee', ,'#eea29a','#c94c4c','#6b5b95','#feb236','#d64161','#ff7b25'];
 
 function zeroIndexBorda(votes){
   const options = {};
