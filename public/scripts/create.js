@@ -1,7 +1,6 @@
 $(() => {
   const pollContainer  = document.querySelector('.tableBody');
   const pollOption     = document.querySelector('.pollOption')
-
   const pollOptionList = Sortable.create(pollContainer, {
     filter: ".js-remove",
     animation: 150,
@@ -9,7 +8,7 @@ $(() => {
       const el = pollOptionList.closest(evt.item);
       el && el.remove(pollOption);
     }
-  })
+  });
 
   function createNewPollOption() {
     const $newOption        = $("<div>").addClass("pollOption");
@@ -31,7 +30,7 @@ $(() => {
     $newOptionRow.append($newOption);
 
     return $newOptionRow;
-  }
+  };
 
   function createPollCreatedMessage(data) {
     const $pollCreatedMessage = $("<div>").addClass("alert alert-info pollCreated");
@@ -58,7 +57,7 @@ $(() => {
     $pollCreatedMessage.append($adminLinkMessage);
 
     return $pollCreatedMessage;
-  }
+  };
 
   $(".add").on("click", function(e) {
     $(".tableBody").append(createNewPollOption());
@@ -79,7 +78,6 @@ $(() => {
       pollData['email'] = $('#email').val();
       pollData['question_string'] = $('#pollQuestion').val();
     });
-
 
     $.ajax({
       url: "/polls",

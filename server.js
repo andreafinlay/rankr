@@ -36,8 +36,8 @@ app.use("/styles", sass({
   outputStyle: 'expanded'
 }));
 
-// Helper
-function zeroIndexBorda(votes){
+// Borda helper function
+function zeroIndexBorda(votes) {
   const options = {};
   const num_of_votes = votes.length;
   const results = {};
@@ -74,7 +74,6 @@ app.get("/polls/:poll_id/", (req, res) => {
   });
 });
 
-
 app.get("/polls/:poll_id/:secret_key/data", (req, res) => {
   console.log("here");
     knex
@@ -84,13 +83,12 @@ app.get("/polls/:poll_id/:secret_key/data", (req, res) => {
    .join('vote','vote.option_id','option.id')
    .where('poll.id', req.params.poll_id)
    .then((results) => {
-    console.log(results)
       res.send(results);
-    }).catch(e=>{
-      res.send('<h1>you do not have any results </h1>')
+    }).catch(e => {
+      res.send('<h1>There are no results yet.</h1>')
     })
+ });
 
- })
 // Admin page
 app.get("/polls/:poll_id/:secret_key", (req, res) => {
   const templateVars = {};
@@ -101,15 +99,13 @@ app.get("/polls/:poll_id/:secret_key", (req, res) => {
    .where('poll.id', req.params.poll_id)
    .then((results) => {
         if(req.params.secret_key == results[0].key){
-      console.log(results[0])
         templateVars['results'] = zeroIndexBorda(results);
         templateVars['question']    = results[0].question_string;
         templateVars['poll_id'] = results[0].poll_id;
         templateVars['key'] = results[0].key;
         res.render("admin", templateVars);
-      }
-      else{
-       res.send('Error: 404 - Nothing to see here')
+      } else {
+       res.send('Error: 404 - Not Found')
       }
   });
 });
@@ -118,8 +114,8 @@ app.get("/polls/:poll_id/:secret_key", (req, res) => {
 app.post('/polls',(req,res) => {
   const templateVars = {};
 
-    function generateSecretKey() {
-  return Math.floor((1 + Math.random()) * 0x1000000).toString(16).substring(1);
+  function generateSecretKey() {
+    return Math.floor((1 + Math.random()) * 0x1000000).toString(16).substring(1);
   };
 
   let secretKey = generateSecretKey();
@@ -131,7 +127,7 @@ app.post('/polls',(req,res) => {
         .returning('id')
         .then((creator_id) => resolve(creator_id))
         .catch(e => reject(e));
-      });
+    });
   };
 
   function pollPromise (creator_id){
@@ -147,7 +143,7 @@ app.post('/polls',(req,res) => {
             resolve(poll_id)
           })
            .catch(e => reject(e));
-      });
+    });
   };
 
   function optionPromise (poll_id){
@@ -161,20 +157,20 @@ app.post('/polls',(req,res) => {
     })
   };
 
-creatorPromise()
-  .then((creator_id) => pollPromise(creator_id))
-  .then((poll_id) => optionPromise(poll_id))
-  .then( () => {
-    let emailPollURL   = `http://localhost:8080/polls/${templateVars.poll_id}`
-    let emailPollHTML  = emailPollURL.link(emailPollURL);
-    let emailAdminURL  = `http://localhost:8080/polls/${templateVars.poll_id}/${templateVars.secretkey}`
-    let emailAdminHTML = emailAdminURL.link(emailAdminURL);
-    res.send(templateVars);
-    mg.messages.create("sandbox37aca15d55444736955d58b502031cba.mailgun.org", {
-      from: "Rankr <postmaster@sandbox37aca15d55444736955d58b502031cba.mailgun.org>",
-      to: [/*"aden.collinge@gmail.com"*/, "andreaafinlay@gmail.com"],
-      subject: "Rankr: Your New Poll!",
-      html: `<HTML><head></head><body><div>Your poll, ${templateVars.question_string},
+  creatorPromise()
+    .then((creator_id) => pollPromise(creator_id))
+    .then((poll_id) => optionPromise(poll_id))
+    .then( () => {
+      const emailPollURL   = `http://localhost:8080/polls/${templateVars.poll_id}`
+      const emailPollHTML  = emailPollURL.link(emailPollURL);
+      const emailAdminURL  = `http://localhost:8080/polls/${templateVars.poll_id}/${templateVars.secretkey}`
+      const emailAdminHTML = emailAdminURL.link(emailAdminURL);
+      res.send(templateVars);
+      mg.messages.create("sandbox37aca15d55444736955d58b502031cba.mailgun.org", {
+        from: "Rankr <postmaster@sandbox37aca15d55444736955d58b502031cba.mailgun.org>",
+        to: [process.env.USER_EMAIL],
+        subject: "Rankr: Your New Poll!",
+        html: `<HTML><head></head><body><div>Your poll, ${templateVars.question_string},
               has been successfully created!</div>
              <div>You can view your new poll at: ${emailPollHTML}</div>
              <div>Your secret key is: ${templateVars.secretkey}</div>
@@ -184,12 +180,12 @@ creatorPromise()
     .then(msg => console.log(msg))
     .catch(err => console.log(err));
   }).then( () => {
-    let emailPollURL   = `http://localhost:8080/polls/${templateVars.poll_id}`
-    let emailAdminURL  = `http://localhost:8080/polls/${templateVars.poll_id}/${templateVars.secretkey}`
-    twilioClient.messages.create({
+      const emailPollURL   = `http://localhost:8080/polls/${templateVars.poll_id}`
+      const emailAdminURL  = `http://localhost:8080/polls/${templateVars.poll_id}/${templateVars.secretkey}`
+      twilioClient.messages.create({
         body: `Rankr: Your poll, ${templateVars.question_string}, has been successfully created!\nYou can view your new poll at: ${emailPollURL}\nYour secret key is: ${templateVars.secretkey}\nEnter your poll URL plus your secret key into the address bar to view the results of your poll: ${emailAdminURL}`,
-        to: '+15143478581',
-        from: '+15146133217'
+        to: process.env.USER_PHONE,
+        from: process.env.TWILIO_PHONE
     })
     .then((message) => console.log(message.sid))
   })
@@ -214,7 +210,7 @@ app.post('/polls/:poll_id',(req,res) => {
       .catch(e => reject(e));
       });
     });
-  }
+  };
 
   function sendVoteEmailPromise() {
     return new Promise((resolve, reject) => {
@@ -228,12 +224,10 @@ app.post('/polls/:poll_id',(req,res) => {
           res.send({pollQuestion: results[0].question_string});
           resolve(results);
         })
-
-      })
-    }
+    });
+  };
 
 votePromise()
-
   .then((pollId) => sendVoteEmailPromise(pollId))
   .then((results) => {
     const emailPollURL   = `http://localhost:8080/polls/${data.id}`
@@ -243,7 +237,7 @@ votePromise()
     const pollQuestion   = data.pollQuestion;
     mg.messages.create("sandbox37aca15d55444736955d58b502031cba.mailgun.org", {
       from: "Rankr <postmaster@sandbox37aca15d55444736955d58b502031cba.mailgun.org>",
-      to: [/*"aden.collinge@gmail.com"*/, "andreaafinlay@gmail.com"],
+      to: [process.env.USER_EMAIL],
       subject: "Rankr: Someone Has Voted In Your Poll!",
       html: `<HTML><head></head><body><div>Someone has voted in your poll, ${pollQuestion}!</div>
              <div>You can view your poll at: ${emailPollHTML}</div>
@@ -256,8 +250,8 @@ votePromise()
       const pollQuestion = data.pollQuestion;
       twilioClient.messages.create({
           body: `Rankr: Someone has voted in your poll, ${pollQuestion}!\nYou can view your new poll at: ${SMSPollURL}\nYour secret key is: ${data.key}\nEnter your poll URL plus your secret key into the address bar to view the results of your poll: ${SMSAdminURL}`,
-          to: ['+15143478581'],
-          from: '+15146133217'
+          to: process.env.USER_PHONE,
+          from: process.env.TWILIO_PHONE
       })
     })
   })

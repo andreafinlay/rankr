@@ -1,8 +1,9 @@
 $(() => {
 
-  var colors = ['#deeaee', ,'#eea29a','#c94c4c','#6b5b95','#feb236','#d64161','#ff7b25'];
+  const colors = ['#deeaee', ,'#eea29a','#c94c4c','#6b5b95','#feb236','#d64161','#ff7b25'];
 
-  function zeroIndexBorda(votes){
+  // Borda count helper function
+  function zeroIndexBorda(votes) {
     const options = {};
     const num_of_votes = votes.length;
     const results = {};
@@ -22,16 +23,15 @@ $(() => {
     })
   }
 
-
-  var id = $('#question').data('id');
-  var key = $('#question').data('key')
+  const id  = $('#question').data('id');
+  const key = $('#question').data('key');
 
   function getResults(){
     $.ajax({
       method: "GET",
       url: key +"/data",
       complete: function (data) {
-        // Schedule the next
+        // Schedule the next refresh
         setTimeout(getResults, 3000);
       }
     }).done((data) => {
@@ -43,11 +43,14 @@ $(() => {
           "face": "Lato",
           "color": "#B26252"
         })
+
         $resultsTextBox.append($fontTag);
         $fontTag.append($resultsText);
         $('#restultsContainer').append($resultsTextBox);
+
+        // Renders bar graph based on Borda calc
         var bordaResult = zeroIndexBorda(data);
-        bordaResult.forEach((option, i)=>{
+        bordaResult.forEach((option, i) => {
           const $resultBarDiv = $("<div>").addClass("resultBar");
           $resultBarDiv.append('<h4>'+option[0]+'</h4>')
           $resultBarDiv.append('<div style="background-color: '+(colors[i] ||'black')+'; width:'+option[1]+'%; height:30px"></div>')
@@ -56,10 +59,11 @@ $(() => {
       } else {
         const $noVotesAlert     = $("<div>").addClass("alert alert-info pollCreated");
         const $noVotesAlertText = $("<p>No votes have been collected on this poll yet! Check back soon.</p>");
+
         $noVotesAlert.append($noVotesAlertText);
         $('#restultsContainer').append($noVotesAlert);
       }
-    }).fail(()=>{
+    }).fail(() => {
       alert("fail")
     })
   }

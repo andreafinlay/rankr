@@ -3,12 +3,6 @@
 const express = require('express');
 const router  = express.Router();
 
-
-// getPollById()
-
-
-
-
 module.exports = (knex) => {
 
   router.get("/", (req, res) => {
@@ -17,7 +11,7 @@ module.exports = (knex) => {
       .from("poll")
       .then((results) => {
         res.json(results);
-    });
+      });
   });
 
   router.get("/:poll_id", (req, res) => {
@@ -28,10 +22,7 @@ module.exports = (knex) => {
       .where('poll.id', req.params.poll_id)
       .then((results) => {
         res.json(results)
-    });
-
-});
-
-
+      });
+  });
   return router;
 }

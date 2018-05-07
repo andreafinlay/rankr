@@ -13,12 +13,9 @@
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.12/css/all.css" integrity="sha384-G0fIWCsCzJIMAVNQPfjH08cyYaUtMwjJwqiRKxxE/rx96Uroj1BtIQ6MLJuheaO9" crossorigin="anonymous">
 
     <script type="text/javascript" src="/vendor/jquery-3.0.0.js"></script>
-    <script type="text/javascript" src="/scripts/app.js"></script>
-    <script type="text/javascript" src="/scripts/sortable.js"></script>
-     <script type="text/javascript" src="/scripts/poll.js"></script>
+    <script type="text/javascript" src="/scripts/create.js"></script>
+    <script type="text/javascript" src="/scripts/poll.js"></script>
     <script src="//rubaxa.github.io/Sortable/Sortable.js"></script>
-    <!-- <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script> -->
-    <!-- <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script> -->
   </head>
   <body >
     <header>
@@ -32,29 +29,28 @@
     <div id="votePollEverything" >
       <h2 id='question' data-pollid=<%=results[0].poll_id%>><font face="Lato" color="#B26252"><%=results[0].question_string%></font></h2>
 
-    <table class="table table-hover table-bordered" >
-      <thead>
-        <label class="col-form-label">Poll options</label>
-        <p class="form-text text-muted">Drag the options to reorder them, first to last</p>
-        <tr>
-          <th>Option</th>
-        </tr>
-      </thead>
-      <tbody class="tableBody" style="background-color:white;">
-        <% Object.keys(results).forEach((option,i) => { %>
+      <table class="table table-hover table-bordered" >
+        <thead>
+          <label class="col-form-label">Poll options</label>
+          <p class="form-text text-muted">Drag the options to reorder them, first to last</p>
+          <tr>
+            <th>Option</th>
+          </tr>
+        </thead>
+        <tbody class="tableBody" style="background-color:white;">
+          <% Object.keys(results).forEach((option,i) => { %>
           <tr>
             <td class="optionColumn">
-
               <div class="pollOption" data-optionid=<%=results[option].option_id%>>
                 <i class="handle fas fa-bars"></i>
-          <%=results[option].option_name%>
-        </div>
-      </td>
-    </tr>
-        <% }) %>
-      </tbody>
-    </table>
-<button id='submit-vote' class="btn btn-info">submit vote </button>
-</div>
+                <%=results[option].option_name%>
+              </div>
+            </td>
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+      <button id='submit-vote' class="btn btn-info">Submit</button>
+    </div>
   </body>
 </html>
